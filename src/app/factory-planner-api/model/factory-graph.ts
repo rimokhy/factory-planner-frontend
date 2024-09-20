@@ -8,11 +8,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ItemDescriptorDto } from './item-descriptor-dto';
+import { FactoryEdge } from './factory-edge';
+import { FactoryNode } from './factory-node';
 
 
-export interface FactorySiteIO { 
-    item: ItemDescriptorDto;
-    outputPerCycle: number;
+export interface FactoryGraph { 
+    rootSite: FactoryNode;
+    nodes: Array<FactoryNode>;
+    edges: Array<FactoryEdge>;
 }
 

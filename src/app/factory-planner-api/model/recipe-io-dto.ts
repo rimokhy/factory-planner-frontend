@@ -8,11 +8,12 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ItemDescriptorSummary } from './item-descriptor-summary';
+import { ItemDescriptorDto } from './item-descriptor-dto';
 
 
-export interface RecipeIO { 
+export interface RecipeIoDto { 
+    item: ItemDescriptorDto;
     outputPerCycle: number;
-    item: ItemDescriptorSummary;
+    actualOutputPerCycle: number;
 }
 

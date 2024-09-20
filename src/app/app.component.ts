@@ -1,24 +1,37 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {Component} from '@angular/core';
+import {RouterOutlet} from '@angular/router';
 import {RecipePickerComponent} from "./recipe-picker/recipe-picker.component";
 import {ItemDescriptorPickerComponent} from "./item-descriptor-picker/item-descriptor-picker.component";
-import {ItemDescriptorSummary} from "./factory-planner-api";
+import {ItemDescriptorDto} from "./factory-planner-api";
 import {NgIf} from "@angular/common";
+import {Nav, NavComponent} from "./nav/nav.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RecipePickerComponent, ItemDescriptorPickerComponent, NgIf],
+  imports: [RouterOutlet, RecipePickerComponent, ItemDescriptorPickerComponent, NgIf, NavComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'factory-planner';
-  wouf?: ItemDescriptorSummary;
+  title = 'Factory Planner';
+  navigation: Nav[] = [
+    {
+      label: 'Factories',
+      route: '/factories'
+    },
+    {
+      label: 'Plan Factory',
+      route: '/factory-planning'
+    },
+    {
+      label: 'Map',
+      route: '/pranked'
+    },
+    {
+      label: 'Admin',
+      route: '/pranked'
+    },
+  ]
 
-  setWouf(value: ItemDescriptorSummary) {
-    console.log(value);
-    this.wouf = value;
-
-  }
 }

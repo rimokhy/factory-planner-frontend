@@ -12,7 +12,7 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
-import { ItemDescriptorSummary } from '../model/models';
+import { ItemDescriptorDto } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -28,13 +28,13 @@ export interface ItemDescriptorControllerServiceInterface {
      * 
      * @param itemClassName 
      */
-    findByClassName(itemClassName: string, extraHttpRequestParams?: any): Observable<ItemDescriptorSummary>;
+    findByClassName(itemClassName: string, extraHttpRequestParams?: any): Observable<ItemDescriptorDto>;
 
     /**
      * 
      * 
      * @param displayName 
      */
-    searchByDisplayNameLike(displayName: string, extraHttpRequestParams?: any): Observable<Array<ItemDescriptorSummary>>;
+    searchByDisplayNameLike(displayName: string, extraHttpRequestParams?: any): Observable<Array<ItemDescriptorDto>>;
 
 }

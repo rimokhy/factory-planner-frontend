@@ -1,1 +1,11 @@
-<p>RecipePicker</p>
+<form>
+  <mat-form-field>
+    <mat-label>Selected recipe</mat-label>
+    <mat-select [(ngModel)]="selectedRecipeClass" name="recipe">
+      @for (recipe of recipes | async; track recipe) {
+        <mat-option [value]="recipe.className">{{recipe.displayName}}</mat-option>
+      }
+
+    </mat-select>
+  </mat-form-field>
+</form>

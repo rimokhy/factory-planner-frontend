@@ -8,16 +8,11 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { RecipeIO } from './recipe-io';
-import { CraftingMachine } from './crafting-machine';
 
 
-export interface RecipeRequiringSummary { 
-    ingredients: Array<RecipeIO>;
-    manufacturingDuration: number;
-    manufacturedIn: Array<CraftingMachine>;
-    id: string;
-    className: string;
-    displayName: string;
+export interface FactoryEdge { 
+    output: number;
+    source: string;
+    target: string;
 }
 

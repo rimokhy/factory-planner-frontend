@@ -18,11 +18,9 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { RecipeProducingSummary } from '../model/recipe-producing-summary';
+import { RecipeProducingDto } from '../model/recipe-producing-dto';
 // @ts-ignore
-import { RecipeRequiringSummary } from '../model/recipe-requiring-summary';
-// @ts-ignore
-import { RecipeSummary } from '../model/recipe-summary';
+import { RecipeRequiringDto } from '../model/recipe-requiring-dto';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -103,10 +101,10 @@ export class RecipeControllerService implements RecipeControllerServiceInterface
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public findAllByProducedItem(itemClass: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<Array<RecipeSummary>>;
-    public findAllByProducedItem(itemClass: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<RecipeSummary>>>;
-    public findAllByProducedItem(itemClass: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<RecipeSummary>>>;
-    public findAllByProducedItem(itemClass: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public findAllByProducedItem(itemClass: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<RecipeRequiringDto>>;
+    public findAllByProducedItem(itemClass: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<RecipeRequiringDto>>>;
+    public findAllByProducedItem(itemClass: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<RecipeRequiringDto>>>;
+    public findAllByProducedItem(itemClass: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (itemClass === null || itemClass === undefined) {
             throw new Error('Required parameter itemClass was null or undefined when calling findAllByProducedItem.');
         }
@@ -123,7 +121,7 @@ export class RecipeControllerService implements RecipeControllerServiceInterface
         if (localVarHttpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
-                '*/*'
+                'application/json'
             ];
             localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         }
@@ -154,7 +152,7 @@ export class RecipeControllerService implements RecipeControllerServiceInterface
         }
 
         let localVarPath = `/recipes`;
-        return this.httpClient.request<Array<RecipeSummary>>('get', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<Array<RecipeRequiringDto>>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters,
@@ -173,10 +171,10 @@ export class RecipeControllerService implements RecipeControllerServiceInterface
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public findByClassNameProducing(recipeClassName: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<RecipeProducingSummary>;
-    public findByClassNameProducing(recipeClassName: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<RecipeProducingSummary>>;
-    public findByClassNameProducing(recipeClassName: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<RecipeProducingSummary>>;
-    public findByClassNameProducing(recipeClassName: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public findByClassNameProducing(recipeClassName: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<RecipeProducingDto>;
+    public findByClassNameProducing(recipeClassName: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<RecipeProducingDto>>;
+    public findByClassNameProducing(recipeClassName: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<RecipeProducingDto>>;
+    public findByClassNameProducing(recipeClassName: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (recipeClassName === null || recipeClassName === undefined) {
             throw new Error('Required parameter recipeClassName was null or undefined when calling findByClassNameProducing.');
         }
@@ -187,7 +185,7 @@ export class RecipeControllerService implements RecipeControllerServiceInterface
         if (localVarHttpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
-                '*/*'
+                'application/json'
             ];
             localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         }
@@ -218,7 +216,7 @@ export class RecipeControllerService implements RecipeControllerServiceInterface
         }
 
         let localVarPath = `/recipes/${this.configuration.encodeParam({name: "recipeClassName", value: recipeClassName, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/producing`;
-        return this.httpClient.request<RecipeProducingSummary>('get', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<RecipeProducingDto>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -236,10 +234,10 @@ export class RecipeControllerService implements RecipeControllerServiceInterface
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public findByClassNameRequiring(recipeClassName: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<RecipeRequiringSummary>;
-    public findByClassNameRequiring(recipeClassName: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<RecipeRequiringSummary>>;
-    public findByClassNameRequiring(recipeClassName: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<RecipeRequiringSummary>>;
-    public findByClassNameRequiring(recipeClassName: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public findByClassNameRequiring(recipeClassName: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<RecipeRequiringDto>;
+    public findByClassNameRequiring(recipeClassName: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<RecipeRequiringDto>>;
+    public findByClassNameRequiring(recipeClassName: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<RecipeRequiringDto>>;
+    public findByClassNameRequiring(recipeClassName: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (recipeClassName === null || recipeClassName === undefined) {
             throw new Error('Required parameter recipeClassName was null or undefined when calling findByClassNameRequiring.');
         }
@@ -250,7 +248,7 @@ export class RecipeControllerService implements RecipeControllerServiceInterface
         if (localVarHttpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
-                '*/*'
+                'application/json'
             ];
             localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         }
@@ -281,7 +279,7 @@ export class RecipeControllerService implements RecipeControllerServiceInterface
         }
 
         let localVarPath = `/recipes/${this.configuration.encodeParam({name: "recipeClassName", value: recipeClassName, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/requiring`;
-        return this.httpClient.request<RecipeRequiringSummary>('get', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<RecipeRequiringDto>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,

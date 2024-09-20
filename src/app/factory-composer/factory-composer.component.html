@@ -1,0 +1,19 @@
+<mat-accordion>
+  <mat-expansion-panel (opened)="panelOpenState.set(true)" (closed)="panelOpenState.set(false)">
+    <mat-expansion-panel-header>
+      <mat-panel-title>Component {{item().displayName}}</mat-panel-title>
+
+      <mat-panel-description>
+        TODO produced items
+      </mat-panel-description>
+
+    </mat-expansion-panel-header>
+    <app-recipe-picker [item]="item()" (selectedRecipe)="selectedRecipe.next($event)" ></app-recipe-picker>
+
+    <div *ngIf="selectedRecipe | async as recipe">
+      @for (ingredient of recipe.ingredients; track ingredient) {
+        <app-recipe-picker [item]="ingredient.item" (selectedRecipe)="selectedRecipe.next($event)" ></app-recipe-picker>
+      }
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>

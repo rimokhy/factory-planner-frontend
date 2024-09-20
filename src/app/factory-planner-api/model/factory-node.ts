@@ -8,17 +8,22 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { FactoryPlanningRequest } from './factory-planning-request';
+import { Automaton } from './automaton';
+import { FactorySiteIO } from './factory-site-io';
 import { ItemDescriptorDto } from './item-descriptor-dto';
 
 
-export interface FactorySiteInput { 
-    type: FactorySiteInput.TypeEnum;
-    item: ItemDescriptorDto;
-    amountPerCycle: number;
-    ingredients: Array<FactoryPlanningRequest>;
+export interface FactoryNode { 
+    type: FactoryNode.TypeEnum;
+    factorySiteTarget: ItemDescriptorDto;
+    targetAmountPerCycle: number;
+    requiredMachines: number;
+    automaton: Automaton;
+    produces: Array<FactorySiteIO>;
+    id: string;
+    label: string;
 }
-export namespace FactorySiteInput {
+export namespace FactoryNode {
     export type TypeEnum = 'ExtractorSite' | 'RecipeSite';
     export const TypeEnum = {
         ExtractorSite: 'ExtractorSite' as TypeEnum,

@@ -8,11 +8,11 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ItemDescriptorSummary } from './item-descriptor-summary';
+import { RecipeDto } from './recipe-dto';
 import { ExtractingSiteInput } from './extracting-site-input';
 import { CraftingMachineSiteInput } from './crafting-machine-site-input';
 import { Extractor } from './extractor';
-import { RecipeSummary } from './recipe-summary';
+import { ItemDescriptorDto } from './item-descriptor-dto';
 
 
 /**

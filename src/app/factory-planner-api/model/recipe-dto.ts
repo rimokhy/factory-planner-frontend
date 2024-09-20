@@ -8,10 +8,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { CraftingMachine } from './crafting-machine';
 
 
-export interface Destination { 
-    factorySiteId: string;
-    targetAmountPerCycle: number;
+export interface RecipeDto { 
+    id: string;
+    className: string;
+    manufacturingDuration: number;
+    displayName: string;
+    manufacturedIn: Array<CraftingMachine>;
 }
 

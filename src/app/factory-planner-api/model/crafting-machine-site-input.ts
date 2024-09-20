@@ -8,14 +8,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ItemDescriptorSummary } from './item-descriptor-summary';
+import { RecipeDto } from './recipe-dto';
 import { FactorySiteInput } from './factory-site-input';
 import { FactoryPlanningRequest } from './factory-planning-request';
-import { RecipeSummary } from './recipe-summary';
+import { ItemDescriptorDto } from './item-descriptor-dto';
 
 
 export interface CraftingMachineSiteInput extends FactorySiteInput { 
-    recipe: RecipeSummary;
+    recipe: RecipeDto;
 }
 export namespace CraftingMachineSiteInput {
 }

@@ -1,0 +1,14 @@
+<div class="graph-preview">
+  <div *ngIf="graphSubject | async as graph; else loading">
+    <ngx-graph
+      [view]="[500, 300]"
+      layout="dagre"
+      [links]="graph.edges"
+      [nodes]="graph.nodes"
+    >
+    </ngx-graph>
+  </div>
+  <ng-template #loading>
+    loading:)
+  </ng-template>
+</div>

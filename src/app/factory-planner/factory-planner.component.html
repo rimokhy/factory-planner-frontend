@@ -1,0 +1,14 @@
+<div>
+  <app-item-descriptor-picker (itemSelected)="setFactorySiteItem($event)"></app-item-descriptor-picker>
+  <div class="content-wrapper-horizontal">
+    <app-factory-site-preview></app-factory-site-preview>
+
+
+    <div *ngIf="itemDescriptor | async as itemDescriptor; else loading">
+      <app-factory-composer [item]="itemDescriptor"></app-factory-composer>
+    </div>
+    <ng-template #loading>
+      Please select a factory item
+    </ng-template>
+  </div>
+</div>

@@ -1,33 +1,46 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
-import {MatTreeModule} from "@angular/material/tree";
-import {MatIconModule} from "@angular/material/icon";
-import {MatButtonModule} from "@angular/material/button";
-import {NgIf} from "@angular/common";
-import {MatFormFieldModule} from "@angular/material/form-field";
-import {MatSelectModule} from "@angular/material/select";
-import {MatInputModule} from "@angular/material/input";
-import {FormsModule} from "@angular/forms";
-import {FactoryPlannerControllerService, ItemDescriptorSummary, RecipeSummary} from "../factory-planner-api";
+import {ChangeDetectionStrategy, Component, effect, input, model, output} from '@angular/core';
+import {MatInputModule} from '@angular/material/input';
+import {MatSelectModule} from '@angular/material/select';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {FormsModule} from '@angular/forms';
+import {ItemDescriptorDto, RecipeControllerService, RecipeRequiringDto} from "../factory-planner-api";
+import {BehaviorSubject, lastValueFrom, Subject} from "rxjs";
+import {AsyncPipe} from "@angular/common";
 
 
 @Component({
   selector: 'app-recipe-picker',
   standalone: true,
-  imports: [
-    MatFormFieldModule, MatSelectModule, MatInputModule, FormsModule
-  ],
+  imports: [FormsModule, MatFormFieldModule, MatSelectModule, MatInputModule, AsyncPipe],
+
   templateUrl: './recipe-picker.component.html',
   styleUrl: './recipe-picker.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 
 })
 export class RecipePickerComponent {
-  @Input() item!: ItemDescriptorSummary;
-
-  recipes: RecipeSummary[] = []
+  readonly item = input.required<ItemDescriptorDto>();
+  selectedRecipeClass = model<string>()
+  selectedRecipe = output<RecipeRequiringDto>()
+  recipes = new BehaviorSubject<RecipeRequiringDto[]>([])
 
   constructor(
-    private readonly factoryPlannerControllerService: FactoryPlannerControllerService
+    private readonly recipeService: RecipeControllerService
   ) {
+    this.selectedRecipeClass.subscribe(recipeClass => {
+      const recipe = this.recipes.value.find(e => e.className === recipeClass)
+
+      if (recipe) {
+        this.selectedRecipe.emit(recipe);
+      } else {
+        console.warn(`Supposed to emit recipe ${recipeClass}, but wasnt found in options`)
+      }
+    })
+    effect(async () => {
+      const itemRecipes = await lastValueFrom(this.recipeService.findAllByProducedItem(this.item().className))
+
+      this.recipes.next(itemRecipes)
+    })
   }
+
 }

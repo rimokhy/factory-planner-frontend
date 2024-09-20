@@ -8,16 +8,17 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { RecipeIO } from './recipe-io';
+import { RecipeIoDto } from './recipe-io-dto';
 import { CraftingMachine } from './crafting-machine';
 
 
-export interface RecipeProducingSummary { 
-    producing: Array<RecipeIO>;
-    manufacturingDuration: number;
-    manufacturedIn: Array<CraftingMachine>;
+export interface RecipeProducingDto { 
     id: string;
     className: string;
+    manufacturingDuration: number;
     displayName: string;
+    manufacturedIn: Array<CraftingMachine>;
+    producing: Array<RecipeIoDto>;
+    manufacturingDurationByMinute: number;
 }
 

@@ -1,0 +1,19 @@
+.picker {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.number-input {
+  width: 6em;
+}
+
+.image-container {
+  width: 10%;
+  max-height: 10%;
+}
+
+img {
+  width: 100%;
+  height: 100%;
+}

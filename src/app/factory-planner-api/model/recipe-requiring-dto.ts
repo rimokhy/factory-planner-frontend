@@ -8,13 +8,16 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { RecipeIoDto } from './recipe-io-dto';
+import { CraftingMachine } from './crafting-machine';
 
 
-export interface Automaton { 
-    minPotential: number;
-    maxPotential: number;
-    productionBoost: number;
+export interface RecipeRequiringDto { 
+    id: string;
     className: string;
+    manufacturingDuration: number;
     displayName: string;
+    manufacturedIn: Array<CraftingMachine>;
+    ingredients: Array<RecipeIoDto>;
 }
 

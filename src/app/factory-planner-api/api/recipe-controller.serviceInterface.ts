@@ -12,9 +12,8 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
-import { RecipeProducingSummary } from '../model/models';
-import { RecipeRequiringSummary } from '../model/models';
-import { RecipeSummary } from '../model/models';
+import { RecipeProducingDto } from '../model/models';
+import { RecipeRequiringDto } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -30,20 +29,20 @@ export interface RecipeControllerServiceInterface {
      * 
      * @param itemClass 
      */
-    findAllByProducedItem(itemClass: string, extraHttpRequestParams?: any): Observable<Array<RecipeSummary>>;
+    findAllByProducedItem(itemClass: string, extraHttpRequestParams?: any): Observable<Array<RecipeRequiringDto>>;
 
     /**
      * 
      * 
      * @param recipeClassName 
      */
-    findByClassNameProducing(recipeClassName: string, extraHttpRequestParams?: any): Observable<RecipeProducingSummary>;
+    findByClassNameProducing(recipeClassName: string, extraHttpRequestParams?: any): Observable<RecipeProducingDto>;
 
     /**
      * 
      * 
      * @param recipeClassName 
      */
-    findByClassNameRequiring(recipeClassName: string, extraHttpRequestParams?: any): Observable<RecipeRequiringSummary>;
+    findByClassNameRequiring(recipeClassName: string, extraHttpRequestParams?: any): Observable<RecipeRequiringDto>;
 
 }

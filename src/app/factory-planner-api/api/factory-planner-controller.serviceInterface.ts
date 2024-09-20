@@ -14,8 +14,8 @@ import { Observable }                                        from 'rxjs';
 
 import { CraftingMachineSiteInput } from '../model/models';
 import { ExtractingSiteInput } from '../model/models';
+import { FactoryGraph } from '../model/models';
 import { FactoryPlanningRequest } from '../model/models';
-import { FactorySite } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -31,6 +31,6 @@ export interface FactoryPlannerControllerServiceInterface {
      * 
      * @param craftingMachineSiteInputExtractingSiteInput 
      */
-    factoryPlanning(craftingMachineSiteInputExtractingSiteInput: CraftingMachineSiteInput | ExtractingSiteInput, extraHttpRequestParams?: any): Observable<FactorySite>;
+    factoryPlanning(craftingMachineSiteInputExtractingSiteInput: CraftingMachineSiteInput | ExtractingSiteInput, extraHttpRequestParams?: any): Observable<FactoryGraph>;
 
 }

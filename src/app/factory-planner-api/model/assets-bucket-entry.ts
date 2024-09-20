@@ -8,14 +8,10 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { CraftingMachine } from './crafting-machine';
 
 
-export interface RecipeSummary { 
-    manufacturingDuration: number;
-    manufacturedIn: Array<CraftingMachine>;
-    id: string;
-    className: string;
-    displayName: string;
+export interface AssetsBucketEntry { 
+    objectPath: string;
+    link?: string;
 }
 

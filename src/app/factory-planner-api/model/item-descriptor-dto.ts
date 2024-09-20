@@ -9,18 +9,19 @@
  * Do not edit the class manually.
  */
 import { Extractor } from './extractor';
+import { AssetsBucketEntry } from './assets-bucket-entry';
 
 
-export interface ItemDescriptorSummary { 
-    category: ItemDescriptorSummary.CategoryEnum;
-    sinkablePoints?: number;
-    iconSmall?: string;
-    form?: string;
-    extractedIn: Set<Extractor>;
+export interface ItemDescriptorDto { 
     className: string;
     displayName: string;
+    form: string;
+    sinkablePoints?: number;
+    category: ItemDescriptorDto.CategoryEnum;
+    extractedIn: Set<Extractor>;
+    icon: AssetsBucketEntry;
 }
-export namespace ItemDescriptorSummary {
+export namespace ItemDescriptorDto {
     export type CategoryEnum = 'Raw' | 'Biomass' | 'Building' | 'Equipment' | 'Craftable' | 'Vehicle' | 'Consumable' | 'PowerShard';
     export const CategoryEnum = {
         Raw: 'Raw' as CategoryEnum,

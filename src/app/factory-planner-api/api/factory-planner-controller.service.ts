@@ -22,9 +22,9 @@ import { CraftingMachineSiteInput } from '../model/crafting-machine-site-input';
 // @ts-ignore
 import { ExtractingSiteInput } from '../model/extracting-site-input';
 // @ts-ignore
-import { FactoryPlanningRequest } from '../model/factory-planning-request';
+import { FactoryGraph } from '../model/factory-graph';
 // @ts-ignore
-import { FactorySite } from '../model/factory-site';
+import { FactoryPlanningRequest } from '../model/factory-planning-request';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -105,10 +105,10 @@ export class FactoryPlannerControllerService implements FactoryPlannerController
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public factoryPlanning(craftingMachineSiteInputExtractingSiteInput: CraftingMachineSiteInput | ExtractingSiteInput, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<FactorySite>;
-    public factoryPlanning(craftingMachineSiteInputExtractingSiteInput: CraftingMachineSiteInput | ExtractingSiteInput, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<FactorySite>>;
-    public factoryPlanning(craftingMachineSiteInputExtractingSiteInput: CraftingMachineSiteInput | ExtractingSiteInput, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<FactorySite>>;
-    public factoryPlanning(craftingMachineSiteInputExtractingSiteInput: CraftingMachineSiteInput | ExtractingSiteInput, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: '*/*', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public factoryPlanning(craftingMachineSiteInputExtractingSiteInput: CraftingMachineSiteInput | ExtractingSiteInput, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<FactoryGraph>;
+    public factoryPlanning(craftingMachineSiteInputExtractingSiteInput: CraftingMachineSiteInput | ExtractingSiteInput, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<FactoryGraph>>;
+    public factoryPlanning(craftingMachineSiteInputExtractingSiteInput: CraftingMachineSiteInput | ExtractingSiteInput, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<FactoryGraph>>;
+    public factoryPlanning(craftingMachineSiteInputExtractingSiteInput: CraftingMachineSiteInput | ExtractingSiteInput, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (craftingMachineSiteInputExtractingSiteInput === null || craftingMachineSiteInputExtractingSiteInput === undefined) {
             throw new Error('Required parameter craftingMachineSiteInputExtractingSiteInput was null or undefined when calling factoryPlanning.');
         }
@@ -119,7 +119,7 @@ export class FactoryPlannerControllerService implements FactoryPlannerController
         if (localVarHttpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
-                '*/*'
+                'application/json'
             ];
             localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         }
@@ -159,7 +159,7 @@ export class FactoryPlannerControllerService implements FactoryPlannerController
         }
 
         let localVarPath = `/factory-planning`;
-        return this.httpClient.request<FactorySite>('post', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<FactoryGraph>('post', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 body: craftingMachineSiteInputExtractingSiteInput,
