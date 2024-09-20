@@ -5,13 +5,13 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {FormsModule} from '@angular/forms';
 import {ItemDescriptorDto, RecipeControllerService, RecipeRequiringDto} from "../factory-planner-api";
 import {BehaviorSubject, lastValueFrom, Subject} from "rxjs";
-import {AsyncPipe} from "@angular/common";
+import {AsyncPipe, NgIf} from "@angular/common";
 
 
 @Component({
   selector: 'app-recipe-picker',
   standalone: true,
-  imports: [FormsModule, MatFormFieldModule, MatSelectModule, MatInputModule, AsyncPipe],
+  imports: [FormsModule, MatFormFieldModule, MatSelectModule, MatInputModule, AsyncPipe, NgIf],
 
   templateUrl: './recipe-picker.component.html',
   styleUrl: './recipe-picker.component.scss',

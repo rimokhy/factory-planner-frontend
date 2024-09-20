@@ -5,7 +5,9 @@
       @for (recipe of recipes | async; track recipe) {
         <mat-option [value]="recipe.className">{{recipe.displayName}}</mat-option>
       }
-
+      @for (extractor of item().extractedIn; track extractor) {
+        <mat-option [value]="extractor.className">{{extractor.displayName}}</mat-option>
+      }
     </mat-select>
   </mat-form-field>
 </form>

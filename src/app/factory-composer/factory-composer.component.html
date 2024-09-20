@@ -10,9 +10,15 @@
     </mat-expansion-panel-header>
     <app-recipe-picker [item]="item()" (selectedRecipe)="selectedRecipe.next($event)" ></app-recipe-picker>
 
+
     <div *ngIf="selectedRecipe | async as recipe">
       @for (ingredient of recipe.ingredients; track ingredient) {
-        <app-recipe-picker [item]="ingredient.item" (selectedRecipe)="selectedRecipe.next($event)" ></app-recipe-picker>
+        @if (ingredient.item.extractedIn.size > 0) {
+          <p>root</p>
+        }
+        @else {
+          <app-factory-composer [item]="ingredient.item"></app-factory-composer>
+        }
       }
     </div>
   </mat-expansion-panel>
