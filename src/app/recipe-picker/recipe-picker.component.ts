@@ -39,7 +39,9 @@ export class RecipePickerComponent {
     effect(async () => {
       const itemRecipes = await lastValueFrom(this.recipeService.findAllByProducedItem(this.item().className))
 
+/*
       this.recipes.next(itemRecipes)
+*/
     })
   }
 

@@ -1,13 +1,78 @@
-<div class="graph-preview">
-  <div *ngIf="graphSubject | async as graph; else loading">
+<div xmlns:xhtml="http://www.w3.org/1999/html">
+  <div *ngIf="graphSubject | async as graph; else loading" class="graph-preview">
+
     <ngx-graph
-      [view]="[500, 300]"
-      layout="dagre"
+      class="chart-container"
       [links]="graph.edges"
       [nodes]="graph.nodes"
+      [draggingEnabled]="false"
+      [clusters]="graph.clusters"
+      [scheme]="'vivid'"
+      [update$]="updateGraph"
+      layout="dagre"
     >
+      <ng-template #defsTemplate>
+        <svg:marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="4" markerHeight="4" orient="auto">
+          <svg:path d="M0,-5L10,0L0,5" class="arrow-head" fill="white"/>
+        </svg:marker>
+      </ng-template>
+
+      <ng-template #clusterTemplate let-cluster>
+        <svg:g class="node cluster">
+          <svg:text alignment-baseline="top" [attr.x]="10" [attr.y]="cluster.dimension.height / 2">
+            {{ cluster.label }}
+          </svg:text>
+          <svg:rect
+            rx="5"
+            ry="5"
+            [attr.width]="cluster.dimension.width"
+            [attr.height]="cluster.dimension.height"
+            [attr.fill]="cluster.data.color"
+          />
+        </svg:g>
+      </ng-template>
+
+      <ng-template #nodeTemplate let-node>
+
+        <svg:g  (click)="onNodeClick(node)">
+          <svg:rect
+            [attr.width]="150"
+            [attr.height]="50"
+            [attr.fill]="node.data.color"
+          />
+
+          <svg:foreignObject [class]="'graph-node-container'" [attr.width]="150" [attr.height]="50">
+
+            <div class="image-container">
+              <xhtml:img [class]="'png-icon'" [attr.src]="getNodeIcon(node)"></xhtml:img>
+
+              <xhtml:label class="label" style="text-align: center;">{{node.label}}</xhtml:label>
+            </div>
+
+          </svg:foreignObject>
+
+        </svg:g>
+      </ng-template>
+
+      <ng-template #linkTemplate let-link>
+        <svg:g class="edge">
+          <svg:path class="line" stroke-width="2" marker-end="url(#arrow)"></svg:path>
+          <svg:text class="edge-label" text-anchor="middle"               style="fill: white"
+          >
+            <textPath
+              class="text-path"
+              [attr.href]="'#' + link.id"
+              [style.dominant-baseline]="link.dominantBaseline"
+              startOffset="50%"
+            >
+              {{ link.outputPerCycle }}
+            </textPath>
+          </svg:text>
+        </svg:g>
+      </ng-template>
     </ngx-graph>
   </div>
+
   <ng-template #loading>
     loading:)
   </ng-template>

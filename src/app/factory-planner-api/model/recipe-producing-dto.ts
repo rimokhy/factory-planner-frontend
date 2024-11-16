@@ -9,7 +9,7 @@
  * Do not edit the class manually.
  */
 import { RecipeIoDto } from './recipe-io-dto';
-import { CraftingMachine } from './crafting-machine';
+import { CraftingMachineEntity } from './crafting-machine-entity';
 
 
 export interface RecipeProducingDto { 
@@ -17,7 +17,7 @@ export interface RecipeProducingDto {
     className: string;
     manufacturingDuration: number;
     displayName: string;
-    manufacturedIn: Array<CraftingMachine>;
+    manufacturedIn: Array<CraftingMachineEntity>;
     producing: Array<RecipeIoDto>;
     manufacturingDurationByMinute: number;
 }

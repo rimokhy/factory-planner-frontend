@@ -36,6 +36,13 @@ export interface RecipeControllerServiceInterface {
      * 
      * @param recipeClassName 
      */
+    findByClassName(recipeClassName: string, extraHttpRequestParams?: any): Observable<RecipeProducingDto>;
+
+    /**
+     * 
+     * 
+     * @param recipeClassName 
+     */
     findByClassNameProducing(recipeClassName: string, extraHttpRequestParams?: any): Observable<RecipeProducingDto>;
 
     /**

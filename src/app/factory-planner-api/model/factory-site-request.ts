@@ -8,17 +8,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ItemDescriptorDto } from './item-descriptor-dto';
 
 
-export interface FactoryNode { 
-    type: FactoryNode.TypeEnum;
+export interface FactorySiteRequest { 
+    type: FactorySiteRequest.TypeEnum;
+    itemClass: string;
     targetAmountPerCycle: number;
-    factorySiteTarget: ItemDescriptorDto;
-    id: string;
-    label: string;
 }
-export namespace FactoryNode {
+export namespace FactorySiteRequest {
     export type TypeEnum = 'ExtractorSite' | 'CraftingSite' | 'ItemSite';
     export const TypeEnum = {
         ExtractorSite: 'ExtractorSite' as TypeEnum,

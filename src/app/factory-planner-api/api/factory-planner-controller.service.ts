@@ -18,13 +18,15 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { CraftingMachineSiteInput } from '../model/crafting-machine-site-input';
+import { CraftingSiteRequest } from '../model/crafting-site-request';
 // @ts-ignore
-import { ExtractingSiteInput } from '../model/extracting-site-input';
+import { ExtractingSiteRequest } from '../model/extracting-site-request';
 // @ts-ignore
-import { FactoryGraph } from '../model/factory-graph';
+import { GraphBuilderFactoryNodeFactoryEdge } from '../model/graph-builder-factory-node-factory-edge';
 // @ts-ignore
-import { FactoryPlanningRequest } from '../model/factory-planning-request';
+import { ItemSiteRequest } from '../model/item-site-request';
+// @ts-ignore
+import { PlanFactorySiteRequest } from '../model/plan-factory-site-request';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -101,16 +103,16 @@ export class FactoryPlannerControllerService implements FactoryPlannerController
     }
 
     /**
-     * @param craftingMachineSiteInputExtractingSiteInput 
+     * @param craftingSiteRequestExtractingSiteRequestItemSiteRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public factoryPlanning(craftingMachineSiteInputExtractingSiteInput: CraftingMachineSiteInput | ExtractingSiteInput, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<FactoryGraph>;
-    public factoryPlanning(craftingMachineSiteInputExtractingSiteInput: CraftingMachineSiteInput | ExtractingSiteInput, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<FactoryGraph>>;
-    public factoryPlanning(craftingMachineSiteInputExtractingSiteInput: CraftingMachineSiteInput | ExtractingSiteInput, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<FactoryGraph>>;
-    public factoryPlanning(craftingMachineSiteInputExtractingSiteInput: CraftingMachineSiteInput | ExtractingSiteInput, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (craftingMachineSiteInputExtractingSiteInput === null || craftingMachineSiteInputExtractingSiteInput === undefined) {
-            throw new Error('Required parameter craftingMachineSiteInputExtractingSiteInput was null or undefined when calling factoryPlanning.');
+    public planFactorySite(craftingSiteRequestExtractingSiteRequestItemSiteRequest: CraftingSiteRequest | ExtractingSiteRequest | ItemSiteRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<GraphBuilderFactoryNodeFactoryEdge>;
+    public planFactorySite(craftingSiteRequestExtractingSiteRequestItemSiteRequest: CraftingSiteRequest | ExtractingSiteRequest | ItemSiteRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<GraphBuilderFactoryNodeFactoryEdge>>;
+    public planFactorySite(craftingSiteRequestExtractingSiteRequestItemSiteRequest: CraftingSiteRequest | ExtractingSiteRequest | ItemSiteRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<GraphBuilderFactoryNodeFactoryEdge>>;
+    public planFactorySite(craftingSiteRequestExtractingSiteRequestItemSiteRequest: CraftingSiteRequest | ExtractingSiteRequest | ItemSiteRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (craftingSiteRequestExtractingSiteRequestItemSiteRequest === null || craftingSiteRequestExtractingSiteRequestItemSiteRequest === undefined) {
+            throw new Error('Required parameter craftingSiteRequestExtractingSiteRequestItemSiteRequest was null or undefined when calling planFactorySite.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -158,11 +160,11 @@ export class FactoryPlannerControllerService implements FactoryPlannerController
             }
         }
 
-        let localVarPath = `/factory-planning`;
-        return this.httpClient.request<FactoryGraph>('post', `${this.configuration.basePath}${localVarPath}`,
+        let localVarPath = `/factory-site/plan`;
+        return this.httpClient.request<GraphBuilderFactoryNodeFactoryEdge>('post', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: craftingMachineSiteInputExtractingSiteInput,
+                body: craftingSiteRequestExtractingSiteRequestItemSiteRequest,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,

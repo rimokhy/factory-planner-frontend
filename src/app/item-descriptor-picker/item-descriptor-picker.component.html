@@ -1,6 +1,6 @@
 <form class="picker">
-    <div *ngIf="selectedItem !== undefined">
-      <img src="{{selectedItem.icon.link}}" alt="${{selectedItem.icon.objectPath}}">
+    <div *ngIf="selectedItem !== undefined" >
+      <img class="png-icon" src="{{selectedItem.icon.link}}" alt="${{selectedItem.icon.objectPath}}">
     </div>
 
     <mat-form-field class="image-container">

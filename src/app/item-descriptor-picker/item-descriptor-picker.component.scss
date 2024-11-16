@@ -2,18 +2,15 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
+
 }
 
 .number-input {
   width: 6em;
 }
 
-.image-container {
-  width: 10%;
-  max-height: 10%;
-}
-
 img {
-  width: 100%;
+  width: 25%;
   height: 100%;
 }

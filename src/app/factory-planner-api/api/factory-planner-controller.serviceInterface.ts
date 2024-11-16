@@ -12,10 +12,11 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
-import { CraftingMachineSiteInput } from '../model/models';
-import { ExtractingSiteInput } from '../model/models';
-import { FactoryGraph } from '../model/models';
-import { FactoryPlanningRequest } from '../model/models';
+import { CraftingSiteRequest } from '../model/models';
+import { ExtractingSiteRequest } from '../model/models';
+import { GraphBuilderFactoryNodeFactoryEdge } from '../model/models';
+import { ItemSiteRequest } from '../model/models';
+import { PlanFactorySiteRequest } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -29,8 +30,8 @@ export interface FactoryPlannerControllerServiceInterface {
     /**
      * 
      * 
-     * @param craftingMachineSiteInputExtractingSiteInput 
+     * @param craftingSiteRequestExtractingSiteRequestItemSiteRequest 
      */
-    factoryPlanning(craftingMachineSiteInputExtractingSiteInput: CraftingMachineSiteInput | ExtractingSiteInput, extraHttpRequestParams?: any): Observable<FactoryGraph>;
+    planFactorySite(craftingSiteRequestExtractingSiteRequestItemSiteRequest: CraftingSiteRequest | ExtractingSiteRequest | ItemSiteRequest, extraHttpRequestParams?: any): Observable<GraphBuilderFactoryNodeFactoryEdge>;
 
 }

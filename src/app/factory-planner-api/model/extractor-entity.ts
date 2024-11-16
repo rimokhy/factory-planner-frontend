@@ -10,7 +10,7 @@
  */
 
 
-export interface Extractor { 
+export interface ExtractorEntity { 
     className: string;
     displayName: string;
     description: string;

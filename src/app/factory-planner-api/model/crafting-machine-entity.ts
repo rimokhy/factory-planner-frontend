@@ -10,7 +10,7 @@
  */
 
 
-export interface CraftingMachine { 
+export interface CraftingMachineEntity { 
     className: string;
     displayName: string;
     description: string;

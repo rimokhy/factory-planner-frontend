@@ -28,7 +28,7 @@ export interface ItemDescriptorControllerServiceInterface {
      * 
      * @param itemClassName 
      */
-    findByClassName(itemClassName: string, extraHttpRequestParams?: any): Observable<ItemDescriptorDto>;
+    findByClassName1(itemClassName: string, extraHttpRequestParams?: any): Observable<ItemDescriptorDto>;
 
     /**
      * 

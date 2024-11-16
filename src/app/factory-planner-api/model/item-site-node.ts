@@ -8,16 +8,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { FactorySiteInput } from './factory-site-input';
-import { FactoryPlanningRequest } from './factory-planning-request';
-import { Extractor } from './extractor';
+import { FactoryNode } from './factory-node';
 import { ItemDescriptorDto } from './item-descriptor-dto';
 
 
-export interface ExtractingSiteInput extends FactorySiteInput { 
-    extractor: Extractor;
+export interface ItemSiteNode extends FactoryNode { 
 }
-export namespace ExtractingSiteInput {
+export namespace ItemSiteNode {
 }
 
 

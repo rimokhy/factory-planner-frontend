@@ -99,12 +99,12 @@ export class ItemDescriptorControllerService implements ItemDescriptorController
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public findByClassName(itemClassName: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ItemDescriptorDto>;
-    public findByClassName(itemClassName: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ItemDescriptorDto>>;
-    public findByClassName(itemClassName: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ItemDescriptorDto>>;
-    public findByClassName(itemClassName: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public findByClassName1(itemClassName: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ItemDescriptorDto>;
+    public findByClassName1(itemClassName: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ItemDescriptorDto>>;
+    public findByClassName1(itemClassName: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ItemDescriptorDto>>;
+    public findByClassName1(itemClassName: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (itemClassName === null || itemClassName === undefined) {
-            throw new Error('Required parameter itemClassName was null or undefined when calling findByClassName.');
+            throw new Error('Required parameter itemClassName was null or undefined when calling findByClassName1.');
         }
 
         let localVarHeaders = this.defaultHeaders;

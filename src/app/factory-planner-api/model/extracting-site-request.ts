@@ -8,13 +8,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { FactorySiteRequest } from './factory-site-request';
 
 
-export interface Automaton { 
-    minPotential: number;
-    maxPotential: number;
-    productionBoost: number;
-    className: string;
-    displayName: string;
+export interface ExtractingSiteRequest extends FactorySiteRequest { 
+    extractorClass: string;
 }
+export namespace ExtractingSiteRequest {
+}
+
 

@@ -8,14 +8,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { CraftingMachine } from './crafting-machine';
+import { FactorySiteRequest } from './factory-site-request';
 
 
-export interface RecipeDto { 
-    id: string;
-    className: string;
-    manufacturingDuration: number;
-    displayName: string;
-    manufacturedIn: Array<CraftingMachine>;
+export interface CraftingSiteRequest extends FactorySiteRequest { 
+    recipeClass: string;
 }
+export namespace CraftingSiteRequest {
+}
+
 

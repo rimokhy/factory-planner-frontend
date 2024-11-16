@@ -8,11 +8,12 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { FactorySiteRequest } from './factory-site-request';
 
 
-export interface FactoryEdge { 
-    outputPerCycle: number;
-    source: string;
-    target: string;
+export interface ItemSiteRequest extends FactorySiteRequest { 
 }
+export namespace ItemSiteRequest {
+}
+
 
