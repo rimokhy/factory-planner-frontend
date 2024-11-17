@@ -17,8 +17,8 @@ export class AppComponent {
   title = 'Factory Planner';
   navigation: Nav[] = [
     {
-      label: 'Factories',
-      route: '/factories'
+      label: 'Power Generator Site',
+      route: '/power-generator-planning',
     },
     {
       label: 'Plan Factory',
@@ -26,10 +26,6 @@ export class AppComponent {
     },
     {
       label: 'Map',
-      route: '/pranked'
-    },
-    {
-      label: 'Admin',
       route: '/pranked'
     },
   ]

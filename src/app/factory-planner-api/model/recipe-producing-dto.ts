@@ -9,15 +9,14 @@
  * Do not edit the class manually.
  */
 import { RecipeIoDto } from './recipe-io-dto';
-import { CraftingMachineEntity } from './crafting-machine-entity';
+import { CraftingMachineDto } from './crafting-machine-dto';
 
 
 export interface RecipeProducingDto { 
-    id: string;
     className: string;
     manufacturingDuration: number;
     displayName: string;
-    manufacturedIn: Array<CraftingMachineEntity>;
+    manufacturedIn: Array<CraftingMachineDto>;
     producing: Array<RecipeIoDto>;
     manufacturingDurationByMinute: number;
 }

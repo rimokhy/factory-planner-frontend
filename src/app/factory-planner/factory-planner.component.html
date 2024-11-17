@@ -1,10 +1,4 @@
-<div>
-  <app-item-descriptor-picker (itemSelected)="setFactorySiteItem($event)"></app-item-descriptor-picker>
-  <div class="content-wrapper-horizontal">
-    <app-factory-site-preview [siteItem]="itemDescriptor"></app-factory-site-preview>
+<div class="content-wrapper-horizontal">
+  <app-factory-site-preview></app-factory-site-preview>
 
-    <ng-template #loading>
-      Please select a factory item
-    </ng-template>
-  </div>
 </div>

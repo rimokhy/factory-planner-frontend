@@ -1,0 +1,18 @@
+<mat-card>
+  <mat-card-content>
+    <mat-list>
+      @for (factoryRequirement of requiredFactoryItems; track factoryRequirement) {
+        <app-item-descriptor-picker [itemSelected]="factoryRequirement.item" [amountSelected]="factoryRequirement.requiredAmount" ></app-item-descriptor-picker>
+      }
+    </mat-list>
+  </mat-card-content>
+
+  <mat-divider></mat-divider>
+
+  <mat-card-footer class="card-footer">
+    <button mat-icon-button aria-label="Add factory requirement" (click)="addFactoryRequirement()">
+      <mat-icon>add</mat-icon>
+    </button>
+  </mat-card-footer>
+</mat-card>
+

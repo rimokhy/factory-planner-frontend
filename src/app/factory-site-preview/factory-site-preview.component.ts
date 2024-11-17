@@ -1,66 +1,27 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {BehaviorSubject, lastValueFrom, Subject} from "rxjs";
-import {ClusterNode, Edge, NgxGraphModule, Node} from "@swimlane/ngx-graph";
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
+import {lastValueFrom, Subject} from "rxjs";
+import {NgxGraphModule} from "@swimlane/ngx-graph";
 import {AsyncPipe, NgIf} from "@angular/common";
 import {
   CraftingSiteNode,
   CraftingSiteRequest,
   ExtractingSiteNode,
   ExtractingSiteRequest,
-  FactoryEdge,
   FactoryNode,
   FactoryPlannerControllerService,
   FactorySiteRequest,
-  GraphBuilderFactoryNodeFactoryEdge,
-  GraphBuilderFactoryNodeFactoryEdgeNodesInner,
-  ItemDescriptorDto,
   ItemSiteRequest
 } from "../factory-planner-api";
-import {MatCard, MatCardContent} from "@angular/material/card";
+import {MatCard, MatCardContent, MatCardFooter} from "@angular/material/card";
 import {MatIcon} from "@angular/material/icon";
-import {ActivatedRoute} from "@angular/router";
+import {GraphNavigator, GraphNode} from "./graph/graph-navigator";
+import {MatTab, MatTabGroup} from "@angular/material/tabs";
+import {MatDivider} from "@angular/material/divider";
+import {FactoryRequirementsComponent} from "../factory-requirements/factory-requirements.component";
+import {isNil} from "lodash";
+import {MatButton, MatIconButton} from "@angular/material/button";
+import {MatTooltip} from "@angular/material/tooltip";
 
-enum NodeType {
-  CraftingSite = 'CraftingSite',
-  ExtractingSite = 'ExtractingSite',
-  ItemSite = 'ItemSite',
-}
-
-type GraphNode = Node & GraphBuilderFactoryNodeFactoryEdgeNodesInner;
-type GraphEdge = Edge & FactoryEdge;
-
-class GraphNavigator {
-  nodes: GraphNode[] = [];
-  edges: GraphEdge[] = [];
-  clusters: ClusterNode[] = [];
-
-
-  async populate({nodes, edges}: GraphBuilderFactoryNodeFactoryEdge) {
-    nodes.forEach((node: GraphNode) => {
-      if (!this.isNodeExisting(node)) {
-        this.nodes.push(node);
-      }
-    })
-
-    edges.forEach(edge => {
-      if (!this.isEdgeExisting(edge)) {
-        this.edges.push(edge);
-      }
-    })
-  }
-
-  selectSite(site: CraftingSiteNode) {
-
-  }
-
-  private isNodeExisting(node: GraphNode): boolean {
-    return this.nodes.some(e => e.id === node.id)
-  }
-
-  private isEdgeExisting(edge: FactoryEdge): boolean {
-    return this.edges.some(e => e.source === edge.source && e.target === edge.target)
-  }
-}
 
 @Component({
   selector: 'app-factory-site-preview',
@@ -71,105 +32,112 @@ class GraphNavigator {
     NgIf,
     MatCard,
     MatCardContent,
-    MatIcon
+    MatIcon,
+    MatTabGroup,
+    MatTab,
+    MatDivider,
+    FactoryRequirementsComponent,
+    MatIconButton,
+    MatButton,
+    MatCardFooter,
+    MatTooltip
   ],
   templateUrl: './factory-site-preview.component.html',
   styleUrl: './factory-site-preview.component.scss'
 })
-export class FactorySitePreviewComponent implements OnInit {
-  @Input() siteItem!: Subject<ItemDescriptorDto>;
-  graphSubject: BehaviorSubject<GraphNavigator>
+export class FactorySitePreviewComponent implements AfterViewInit {
   updateGraph: Subject<boolean> = new Subject();
+  graph = new GraphNavigator(this.updateGraph)
+  @ViewChild(FactoryRequirementsComponent) requirements!: FactoryRequirementsComponent;
 
 
   constructor(
     private readonly factoryPlannerControllerService: FactoryPlannerControllerService,
   ) {
-    this.graphSubject = new BehaviorSubject<GraphNavigator>(new GraphNavigator());
+
   }
 
-  ngOnInit(): void {
-    this.siteItem.subscribe(item => {
-      this.graphSubject.next(new GraphNavigator())
-      this.populateGraph(this.makeItemSiteRequest(item.className, 25))
+  ngAfterViewInit(): void {
+    this.graph.requirements = this.requirements;
+  }
+
+  async onRequirementsChanged() {
+    this.requirements?.requiredFactoryItems.forEach((req) => {
+      if (!isNil(req.item.value)) {
+        this.populateGraph(this.makeItemSiteRequest(req.item.value.className))
+      }
     })
   }
 
   async onNodeClick(nodeClicked: GraphNode) {
-    console.log('nodeClicked', nodeClicked.dimension);
     const request = this.makeFactorySiteRequest(nodeClicked)
-    console.log(request)
 
     return this.populateGraph(request)
   }
-
-  onLinkClick(event: any) {
-    console.log('Link clicked:', event);
-  }
-
-  private makeFactorySiteRequest(nodeClicked: GraphNode): FactorySiteRequest {
-    switch (nodeClicked.type) {
-      case FactoryNode.TypeEnum.ItemSite:
-        return this.makeItemSiteRequest(nodeClicked.factorySiteTarget.className, nodeClicked.targetAmountPerCycle);
-      case FactoryNode.TypeEnum.CraftingSite:
-        return this.makeCraftingSiteRequest(nodeClicked.factorySiteTarget.className, nodeClicked.targetAmountPerCycle, (nodeClicked as CraftingSiteNode).recipe.className);
-      case FactoryNode.TypeEnum.ExtractorSite:
-        return this.makeExtractingSiteRequest(nodeClicked.factorySiteTarget.className, nodeClicked.targetAmountPerCycle, (nodeClicked as ExtractingSiteNode).automaton.className)
-    }
-    console.error('Unhandled node type', nodeClicked);
-    throw new Error('Unhandled node type');
-  }
-
-  private makeItemSiteRequest(itemClass: string, amountPerCycle: number): ItemSiteRequest {
-    return {
-      type: FactorySiteRequest.TypeEnum.ItemSite,
-      itemClass: itemClass,
-      targetAmountPerCycle: amountPerCycle
-    }
-  }
-
-  private makeCraftingSiteRequest(itemClass: string, amountPerCycle: number, recipeClass: string): CraftingSiteRequest {
-    return {
-      type: FactorySiteRequest.TypeEnum.CraftingSite,
-      itemClass: itemClass,
-      targetAmountPerCycle: amountPerCycle,
-      recipeClass: recipeClass,
-    }
-  }
-
-  private makeExtractingSiteRequest(itemClass: string, amountPerCycle: number, extractorClass: string): ExtractingSiteRequest {
-    return {
-      type: FactorySiteRequest.TypeEnum.ExtractorSite,
-      itemClass: itemClass,
-      targetAmountPerCycle: amountPerCycle,
-      extractorClass: extractorClass,
-    }
-  }
-
-  private async populateGraph(request: FactorySiteRequest) {
-    const graph = this.graphSubject.value
-    const graphResponse = await lastValueFrom(this.factoryPlannerControllerService.planFactorySite(request))
-
-    return graph.populate(graphResponse).then(e => this.updateGraph.next(true))
-  }
-
-  getStyles(node: GraphNode) {
-    return {
-
-    }
-  }
-
-
 
   getNodeIcon(node: GraphNode): string | undefined {
     switch (node.type) {
       case FactoryNode.TypeEnum.ItemSite:
         return node.factorySiteTarget.icon.link;
       case FactoryNode.TypeEnum.CraftingSite:
-        return "zaefz";
+        return (node as CraftingSiteNode).automaton.descriptor.icon.link;
       case FactoryNode.TypeEnum.ExtractorSite:
-        return "zefzf"
+        return (node as ExtractingSiteNode).automaton.descriptor.icon.link
     }
-    return ''
+    return undefined
+  }
+
+  getNodeTooltip(node: GraphNode): string | undefined {
+    switch (node.type) {
+      case FactoryNode.TypeEnum.ItemSite:
+        return node.factorySiteTarget.displayName;
+      case FactoryNode.TypeEnum.CraftingSite:
+        return (node as CraftingSiteNode).automaton.displayName;
+      case FactoryNode.TypeEnum.ExtractorSite:
+        return (node as ExtractingSiteNode).automaton.displayName;
+    }
+    return undefined
+  }
+
+  private makeFactorySiteRequest(nodeClicked: GraphNode): FactorySiteRequest {
+    switch (nodeClicked.type) {
+      case FactoryNode.TypeEnum.ItemSite:
+        return this.makeItemSiteRequest(nodeClicked.factorySiteTarget.className);
+      case FactoryNode.TypeEnum.CraftingSite:
+        return this.makeCraftingSiteRequest(nodeClicked.factorySiteTarget.className, (nodeClicked as CraftingSiteNode).recipe.className);
+      case FactoryNode.TypeEnum.ExtractorSite:
+        return this.makeExtractingSiteRequest(nodeClicked.factorySiteTarget.className, (nodeClicked as ExtractingSiteNode).automaton.className)
+    }
+    console.error('Unhandled node type', nodeClicked);
+    throw new Error('Unhandled node type');
+  }
+
+  private makeItemSiteRequest(itemClass: string): ItemSiteRequest {
+    return {
+      type: FactorySiteRequest.TypeEnum.ItemSite,
+      itemClass: itemClass,
+    }
+  }
+
+  private makeCraftingSiteRequest(itemClass: string, recipeClass: string): CraftingSiteRequest {
+    return {
+      type: FactorySiteRequest.TypeEnum.CraftingSite,
+      itemClass: itemClass,
+      recipeClass: recipeClass,
+    }
+  }
+
+  private makeExtractingSiteRequest(itemClass: string, extractorClass: string): ExtractingSiteRequest {
+    return {
+      type: FactorySiteRequest.TypeEnum.ExtractorSite,
+      itemClass: itemClass,
+      extractorClass: extractorClass,
+    }
+  }
+
+  private async populateGraph(request: FactorySiteRequest) {
+    const graphResponse = await lastValueFrom(this.factoryPlannerControllerService.planFactorySite(request))
+
+    return this.graph.populate(graphResponse)
   }
 }

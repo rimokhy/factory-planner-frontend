@@ -1,21 +1,33 @@
-<form class="picker">
-    <div *ngIf="selectedItem !== undefined" >
-      <img class="png-icon" src="{{selectedItem.icon.link}}" alt="${{selectedItem.icon.objectPath}}">
-    </div>
-
-    <mat-form-field class="image-container">
+<form class="item-descriptor-picker-container">
+  <div *ngIf="itemSelected | async as item">
+    <img class="png-icon"  src="{{item.icon.link}}"
+         alt="${{item.icon.objectPath}}">
+  </div>
+  <div>
+    <mat-form-field>
       <mat-label>Item</mat-label>
-      <input type="text" matInput [formControl]="itemDescriptorFormControl" [matAutocomplete]="auto" >
-      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" >
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+
+        <input type="text" matInput [formControl]="itemDescriptorFormControl" [matAutocomplete]="auto">
+      </div>
+
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
         @for (option of filteredOptions | async; track option) {
-          <mat-option [value]="option">{{option.displayName}}</mat-option>
+          <mat-option [value]="option">{{ option.displayName }}</mat-option>
         }
       </mat-autocomplete>
     </mat-form-field>
+  </div>
 
-
-  <mat-form-field class="number-input">
-      <mat-label>Number</mat-label>
+  <div class="required-amount-input-container">
+    <mat-form-field class="number-input">
+      <mat-label>Amount / min</mat-label>
       <input type="number" matInput [formControl]="itemNumberFormControl">
     </mat-form-field>
+  </div>
+
+
 </form>
+
+

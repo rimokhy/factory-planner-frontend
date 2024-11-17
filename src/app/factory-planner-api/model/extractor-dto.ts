@@ -8,19 +8,21 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { ItemDescriptorDto } from './item-descriptor-dto';
 
 
-export interface CraftingMachineEntity { 
+export interface ExtractorDto { 
     className: string;
     displayName: string;
     description: string;
-    manufacturingSpeed: number;
+    extractCycleTime: number;
+    itemsPerCycle: number;
     powerConsumption: number;
     powerConsumptionExponent: number;
     minPotential: number;
     maxPotential: number;
     productionBoost: number;
-    manual: boolean;
-    id: string;
+    extractorType: string;
+    descriptor: ItemDescriptorDto;
 }
 

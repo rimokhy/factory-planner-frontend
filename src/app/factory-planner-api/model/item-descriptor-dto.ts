@@ -8,8 +8,8 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ExtractorEntity } from './extractor-entity';
 import { AssetsBucketEntry } from './assets-bucket-entry';
+import { ExtractorDto } from './extractor-dto';
 
 
 export interface ItemDescriptorDto { 
@@ -18,7 +18,7 @@ export interface ItemDescriptorDto {
     form: string;
     sinkablePoints?: number;
     category: ItemDescriptorDto.CategoryEnum;
-    extractedIn: Set<ExtractorEntity>;
+    extractedIn: Set<ExtractorDto>;
     icon: AssetsBucketEntry;
 }
 export namespace ItemDescriptorDto {

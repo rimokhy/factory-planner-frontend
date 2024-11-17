@@ -11,8 +11,16 @@
 import { ItemDescriptorDto } from './item-descriptor-dto';
 
 
-export interface FactorySiteIO { 
-    item: ItemDescriptorDto;
-    outputPerCycle: number;
+export interface CraftingMachineDto { 
+    className: string;
+    displayName: string;
+    description: string;
+    manufacturingSpeed: number;
+    powerConsumption: number;
+    powerConsumptionExponent: number;
+    minPotential: number;
+    maxPotential: number;
+    productionBoost: number;
+    descriptor: ItemDescriptorDto;
 }
 

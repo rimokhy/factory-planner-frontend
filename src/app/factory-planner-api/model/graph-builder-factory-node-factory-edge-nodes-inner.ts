@@ -9,12 +9,11 @@
  * Do not edit the class manually.
  */
 import { ItemSiteNode } from './item-site-node';
+import { RecipeDto } from './recipe-dto';
 import { CraftingSiteNode } from './crafting-site-node';
 import { ExtractingSiteNode } from './extracting-site-node';
-import { ExtractorEntity } from './extractor-entity';
-import { FactorySiteIO } from './factory-site-io';
 import { ItemDescriptorDto } from './item-descriptor-dto';
-import { RecipeProducingDto } from './recipe-producing-dto';
+import { ExtractorDto } from './extractor-dto';
 
 
 /**

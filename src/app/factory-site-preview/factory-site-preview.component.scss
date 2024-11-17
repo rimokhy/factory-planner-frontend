@@ -1,8 +1,30 @@
+
+.factory-selection-content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.factory-preview-content {
+  flex: 1;
+  width: 75%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.factory-requirements-content {
+  min-width: 25%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+
+
 .graph-preview {
-  /*
-  background: white;
-  */
-  height: 1000px;
+  display: grid;
+  height: 100%;
 }
 
 .graph-node-container {
@@ -10,15 +32,37 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 150px;
-  height: 50px;
+  width: 250px;
+  height: 80px;
 
 }
 
-.image-container {
+.graph-content-container {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  width: 100%;
-  height: 100%;
+}
+
+.graph-image-container {
+  position: relative;
+  display: inline-block;
+}
+
+.graph-button-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+
+.graph-content-container img {
+  display: block;
+}
+
+.required-number {
+  position: absolute;
+  bottom: -5px;
+  right: 5px;
+  color: white;
+  font-size: 16px;
 }

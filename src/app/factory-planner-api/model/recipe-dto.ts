@@ -8,17 +8,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { RecipeDto } from './recipe-dto';
-import { FactoryNode } from './factory-node';
-import { ItemDescriptorDto } from './item-descriptor-dto';
 import { CraftingMachineDto } from './crafting-machine-dto';
 
 
-export interface CraftingSiteNode extends FactoryNode { 
-    automaton: CraftingMachineDto;
-    recipe: RecipeDto;
+export interface RecipeDto { 
+    className: string;
+    manufacturingDuration: number;
+    displayName: string;
+    manufacturedIn: Array<CraftingMachineDto>;
 }
-export namespace CraftingSiteNode {
-}
-
 

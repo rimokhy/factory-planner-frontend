@@ -13,7 +13,6 @@
 export interface FactorySiteRequest { 
     type: FactorySiteRequest.TypeEnum;
     itemClass: string;
-    targetAmountPerCycle: number;
 }
 export namespace FactorySiteRequest {
     export type TypeEnum = 'ExtractorSite' | 'CraftingSite' | 'ItemSite';

@@ -8,19 +8,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ExtractorEntity } from './extractor-entity';
-import { FactorySiteIO } from './factory-site-io';
 import { FactoryNode } from './factory-node';
 import { ItemDescriptorDto } from './item-descriptor-dto';
+import { ExtractorDto } from './extractor-dto';
 
 
 export interface ExtractingSiteNode extends FactoryNode { 
-    automaton: ExtractorEntity;
-    requiredMachines: number;
-    produces: Array<FactorySiteIO>;
-    manufacturingDuration: number;
-    cyclePerMinute: number;
-    targetOutputPerMinute: number;
+    automaton: ExtractorDto;
 }
 export namespace ExtractingSiteNode {
 }

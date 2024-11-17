@@ -8,7 +8,6 @@ import {ItemDescriptorDto} from "../factory-planner-api";
 import {Subject} from "rxjs";
 import {AsyncPipe, NgIf} from "@angular/common";
 import {GraphModule} from "@swimlane/ngx-graph";
-import {FactoryComposerComponent} from "../factory-composer/factory-composer.component";
 import {MatCard, MatCardContent} from "@angular/material/card";
 
 @Component({
@@ -23,7 +22,6 @@ import {MatCard, MatCardContent} from "@angular/material/card";
     AsyncPipe,
     GraphModule,
     NgIf,
-    FactoryComposerComponent,
     MatCard,
     MatCardContent
   ],
@@ -31,9 +29,4 @@ import {MatCard, MatCardContent} from "@angular/material/card";
   styleUrl: './factory-planner.component.scss'
 })
 export class FactoryPlannerComponent {
-  itemDescriptor = new Subject<ItemDescriptorDto>();
-
-  setFactorySiteItem(itemDescriptor: ItemDescriptorDto) {
-    this.itemDescriptor.next(itemDescriptor);
-  }
 }

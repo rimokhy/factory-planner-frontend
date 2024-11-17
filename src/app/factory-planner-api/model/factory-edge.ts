@@ -11,8 +11,8 @@
 
 
 export interface FactoryEdge { 
-    outputPerCycle: number;
     source: string;
     target: string;
+    outputPerCycle?: number;
 }
 
