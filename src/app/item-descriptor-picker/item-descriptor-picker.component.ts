@@ -31,9 +31,7 @@ export class ItemDescriptorPickerComponent implements OnInit {
 
   ngOnInit() {
     this.itemNumberFormControl.setValue(0)
-    console.log(this.itemSelected)
     this.itemSelected.subscribe(value => {
-      console.log('received')
       if (!isNil(value)) {
         this.itemDescriptorFormControl.setValue(value);
       }
@@ -54,7 +52,6 @@ export class ItemDescriptorPickerComponent implements OnInit {
         }
       }
       if (value !== null && typeof value === 'object' && value !== this.itemSelected.value) {
-        console.log('emiting')
         this.itemSelected.next(value)
         this.itemNumberFormControl.setValue(1)
       }

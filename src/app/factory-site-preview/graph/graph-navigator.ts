@@ -2,17 +2,20 @@ import {
   CraftingSiteNode,
   ExtractingSiteNode,
   FactoryEdge,
-  FactoryNode,
   GraphBuilderFactoryNodeFactoryEdge,
-  GraphBuilderFactoryNodeFactoryEdgeNodesInner,
-  ItemSiteNode
+  GraphBuilderFactoryNodeFactoryEdgeNodesInner
 } from "../../factory-planner-api";
 import {ClusterNode, Edge, Node} from "@swimlane/ngx-graph";
-import {isEmpty, isNil, max, partition, sum} from "lodash";
+import {isNil, max, partition, sum} from "lodash";
 import {FactoryRequirementsComponent} from "../../factory-requirements/factory-requirements.component";
 import {Subject} from "rxjs";
+import {createNode, isCraftingSiteNode, isItemSiteNode} from "./node.factory";
+import {CraftingSiteNodeImpl} from "./crafting-site.node";
+import {ItemSiteNodeImpl} from "./item-site.node";
+import {ExtractingSiteNodeImpl} from "./extracting-site.node";
 
-export type GraphNode = Node & GraphBuilderFactoryNodeFactoryEdgeNodesInner;
+
+export type GraphNode = Node & (CraftingSiteNodeImpl) | ExtractingSiteNodeImpl | ItemSiteNodeImpl;
 export type GraphEdge = Edge & FactoryEdge;
 
 
@@ -27,9 +30,9 @@ export class GraphNavigator {
   }
 
   async populate({nodes, edges}: GraphBuilderFactoryNodeFactoryEdge) {
-    nodes.forEach((node: GraphNode) => {
+    nodes.forEach((node: GraphBuilderFactoryNodeFactoryEdgeNodesInner) => {
       if (!this.isNodeExisting(node)) {
-        this.nodes.push(node);
+        this.nodes.push(createNode(node) as GraphNode);
       }
     })
 
@@ -38,6 +41,26 @@ export class GraphNavigator {
         this.edges.push(edge);
       }
     })
+    this.nodes
+      .filter(item => this.isRequirement(item))
+      .forEach((item) => {
+        if (!(item instanceof ItemSiteNodeImpl)) {
+          throw new Error('Not item site isntance')
+        }
+        // Set item requirements from user
+        item.requiredAmountPerMinute = this.getRequiredTotal(item.factorySiteTarget.className)
+      })
+    this.computeRecipeIngredients()
+    this.nodes
+      .filter(item => item instanceof ItemSiteNodeImpl)
+      .forEach((item) => {
+        if (!(item instanceof ItemSiteNodeImpl)) {
+          throw new Error('Not item site isntance')
+        }
+        // Calculate requirements from graph
+        console.log('adding req', item.id, this.getOutgoingEdge(item).map(e => e.totalOutputPerCycle))
+        item.requiredAmountPerMinute += sum(this.getOutgoingEdge(item).map(e => e.totalOutputPerMinute))
+      })
     this.updateGraph()
   }
 
@@ -60,6 +83,7 @@ export class GraphNavigator {
       }
 
     })
+
     this.updateGraph()
   }
 
@@ -67,25 +91,6 @@ export class GraphNavigator {
     // TODO remove parent site if useless
     this.disconnectSite(node)
     this.updateGraph()
-  }
-
-  getItemSiteRequiredAmount(site: ItemSiteNode): number {
-    const outgoing = this.getOutgoingEdge(site).map(edge => edge.outputPerCycle).filter(e => !isNil(e))
-
-    return sum(outgoing)
-  }
-
-  computeSiteItemRequiredAmount(site: ItemSiteNode): number {
-    const initialValue = this.isRequirement(site) ? this.getRequiredTotal(site.factorySiteTarget.className) : 0
-    const outgoing = this.getOutgoingEdge(site)
-    const ingoing = this.getIncomingEdges(site)
-
-    if (!this.isRequirement(site) && isEmpty(outgoing) && !isEmpty(ingoing)) {
-
-      return sum(ingoing.map(e => this.computeLink(e)))
-    }
-
-    return sum(outgoing.map(e => this.computeLink(e))) + initialValue
   }
 
   getRequiredTotal(className: string): number {
@@ -96,32 +101,17 @@ export class GraphNavigator {
     }));
   }
 
-  computeRecipeRequiredMachines(site: CraftingSiteNode): number {
-    const selfEdges = this.getOutgoingEdge(site).filter(edge => edge.source === site.id)
-    const products = this.nodes.filter(node => selfEdges.map(edge => edge.target).includes(node.id) && this.isItemSiteNode(node))
-    const machinesRequiredPerProduction = products.map(product => {
-      const totalPerCycle = this.minuteToCycle(site, this.getRequiredTotal(product.factorySiteTarget.className)) + this.getItemSiteRequiredAmount(product)
-      const correspondingEdge = selfEdges.find(edge => edge.source === site.id && edge.target === product.id)
 
-      return totalPerCycle / correspondingEdge?.outputPerCycle!!
-    })
 
-    return max(machinesRequiredPerProduction) || 0
-  }
-
-  computeLink(edge: FactoryEdge): number | undefined {
+  computeLink(edge: FactoryEdge, withDebug = false): number | undefined {
     const source = this.nodes.find(e => e.id === edge.source)
     const target = this.nodes.find(e => e.id === edge.target)
 
-    if (this.isItemSiteNode(source) && this.isCraftingSiteNode(target)) {
-      const requiredMachine = this.computeRecipeRequiredMachines(target)
-
-      return this.cycleToMinute(target, edge.outputPerCycle!! * requiredMachine!!)
+    if (isItemSiteNode(source) && isCraftingSiteNode(target)) {
+      return this.cycleToMinute(target, edge.totalOutputPerCycle!!)
     }
-    if (this.isCraftingSiteNode(source) && this.isItemSiteNode(target)) {
-      const requiredMachine = this.computeRecipeRequiredMachines(source)
-
-      return this.cycleToMinute(source, requiredMachine!! * edge.outputPerCycle!!)
+    if (isCraftingSiteNode(source) && isItemSiteNode(target)) {
+      return this.cycleToMinute(source, edge.totalOutputPerCycle!!)
     }
     return undefined
   }
@@ -133,27 +123,7 @@ export class GraphNavigator {
     return Number(nb).toFixed(3)
   }
 
-  isSourceCraftingSite(link: FactoryEdge): boolean {
-    const source = this.nodes.filter(e => e.id === link.source)
-
-    return source.every(node => this.isCraftingSiteNode(node))
-  }
-
-
-  isItemSiteNode(site?: GraphNode): site is ItemSiteNode {
-    return site?.type === FactoryNode.TypeEnum.ItemSite
-  }
-
-  isExtractingSiteNode(site?: GraphNode): site is ExtractingSiteNode {
-    return site?.type === FactoryNode.TypeEnum.ExtractorSite
-  }
-
-  isCraftingSiteNode(site?: GraphNode): site is CraftingSiteNode {
-    return site?.type === FactoryNode.TypeEnum.CraftingSite
-  }
-
   private disconnectSite(node: GraphNode) {
-    // TODO remove parent site if useless
     const outgoing = this.getOutgoingEdge(node).map(edge => {
 
       return edge.id;
@@ -163,36 +133,71 @@ export class GraphNavigator {
     this.edges = this.edges.filter(edge => !outgoing.includes(edge.id) && !ingoing.includes(edge.id));
   }
 
+  private computeRecipeIngredients() {
+    this.nodes.filter(e => e instanceof CraftingSiteNodeImpl).forEach(recipe => {
+      // Calculate required machines for user requirements
+      const products = this.getOutgoingEdge(recipe).map(edge => this.nodes.find(e => e.id === edge.target)).filter(e => !isNil(e));
+      const requiredMachinePerProduct = products.map(productItem => {
+        const req = (productItem as ItemSiteNodeImpl).requiredAmountPerMinute;
+        const recipeToItem = this.getOutgoingEdge(recipe).find(e => e.target === productItem?.id && e.source === recipe.id);
+
+        return this.minuteToCycle(recipe, req) / recipeToItem?.outputPerCycle!!
+      })
+
+      recipe.requiredMachines = max(requiredMachinePerProduct) || 0
+
+      // Set edges requirements per ingredients
+      this.getIncomingEdges(recipe).map(edge => {
+        if (edge.totalOutputPerCycle === undefined) {
+          edge.totalOutputPerCycle = 0
+        }
+        edge.totalOutputPerCycle = recipe.requiredMachines * edge.outputPerCycle!!
+        edge.totalOutputPerMinute = this.cycleToMinute(recipe, edge.totalOutputPerCycle)
+      })
+
+      // Set edges requirements per product item
+      this.getOutgoingEdge(recipe).map(edge => {
+        if (edge.totalOutputPerCycle === undefined) {
+          edge.totalOutputPerCycle = 0
+        }
+        edge.totalOutputPerCycle = recipe.requiredMachines * edge.outputPerCycle!!
+        edge.totalOutputPerMinute = this.cycleToMinute(recipe, edge.totalOutputPerCycle)
+      })
+    })
+  }
+
   private updateGraph() {
     const [remaining, rest] = partition(this.nodes, node => {
       if (this.isRequirement(node)) {
         return true
       }
+      /*
+            if (this.isItemSiteNode(node)) {
+              return this.computeSiteItemRequiredAmount(node) > 0.0
+            }
+            if (this.isCraftingSiteNode(node)) {
+              return this.computeRecipeRequiredMachines(node) > 0.0
+            }
+      */
 
-      if (this.isItemSiteNode(node)) {
-        return this.computeSiteItemRequiredAmount(node) > 0.0
-      }
-      if (this.isCraftingSiteNode(node)) {
-        return this.computeRecipeRequiredMachines(node) > 0.0
-      }
-
-      console.log('skipped', node)
       // TODO see for extracting site
 
       return true
     })
+
     rest.forEach(e => {
       this.disconnectSite(e)
     })
     this.nodes = remaining
-    this.updateGraphSubject.next(true)
   }
 
-  private isRequirement(node: GraphNode): boolean {
+  private isRequirement(node: GraphNode | string): boolean {
     if (!this.requirements) {
       return true
     }
-    return this.requirements.requiredFactoryItems.some(requirement => requirement.item.value?.className === node.id)
+    const nodeId = (typeof node === 'string') ? node : node.id
+
+    return this.requirements.requiredFactoryItems.some(requirement => requirement.item.value?.className === nodeId)
   }
 
   private cycleToMinute(site: CraftingSiteNode, amount: number): number {
@@ -218,15 +223,15 @@ export class GraphNavigator {
     }
   }
 
-  private getOutgoingEdge(node: GraphNode): GraphEdge[] {
+  private getOutgoingEdge(node: GraphBuilderFactoryNodeFactoryEdgeNodesInner): GraphEdge[] {
     return this.edges.filter(edge => edge.source === node.id)
   }
 
-  private getIncomingEdges(node: GraphNode): GraphEdge[] {
+  private getIncomingEdges(node: GraphBuilderFactoryNodeFactoryEdgeNodesInner): GraphEdge[] {
     return this.edges.filter(edge => edge.target === node.id)
   }
 
-  private isNodeExisting(node: GraphNode): boolean {
+  private isNodeExisting(node: GraphBuilderFactoryNodeFactoryEdgeNodesInner): boolean {
     return this.nodes.some(e => e.id === node.id)
   }
 

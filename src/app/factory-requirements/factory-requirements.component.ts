@@ -42,7 +42,6 @@ export class FactoryRequirementsComponent {
     private readonly itemDescriptorService: ItemDescriptorControllerService,
   ) {
     this.activatedRoute.queryParamMap.subscribe(async params => {
-      console.log(params)
       if (!isEmpty(this.requiredFactoryItems)) {
         return;
       }
@@ -65,8 +64,6 @@ export class FactoryRequirementsComponent {
     const newAmount = new BehaviorSubject<number>(amount)
 
     newItem.subscribe(value => {
-      console.log('update params')
-
       if (isNil(value)) {
         return
       }
@@ -75,6 +72,8 @@ export class FactoryRequirementsComponent {
     })
     newAmount.subscribe(value => {
       this.updateQueryParams()
+      this.valueChanged.emit(null)
+
     })
 
     return {

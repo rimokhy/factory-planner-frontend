@@ -1,6 +1,5 @@
-<div class="factory-selection-content " xmlns:xhtml="http://www.w3.org/1999/xhtml"
-     xmlns:svg="http://www.w3.org/1999/XSL/Transform">
-  <div class="factory-preview-content ">
+<div class="factory-selection-content ">
+  <div class="factory-preview-content">
     <mat-tab-group>
       <mat-tab label="Graph view">
         <div>
@@ -8,7 +7,6 @@
             class=" graph-preview"
             [links]="graph.edges"
             [nodes]="graph.nodes"
-            [scheme]="'vivid'"
             [clusters]="graph.clusters"
             [update$]="updateGraph"
             layout="dagreCluster"
@@ -44,24 +42,24 @@
                       <div class="graph-image-container">
                         <xhtml:img [matTooltip]="getNodeTooltip(node)" [class]="'png-icon'"
                                    [attr.src]="getNodeIcon(node)"></xhtml:img>
-                        <div class="required-number" *ngIf="graph.isItemSiteNode(node)">
-                          x{{ graph.displayNumber(graph.computeSiteItemRequiredAmount(node)) }}
+                        <div class="required-number" *ngIf="isItemSiteNode(node)">
+                          x{{ graph.displayNumber(0) }}
                         </div>
-                        <div class="required-number" *ngIf="graph.isCraftingSiteNode(node)">
-                          x{{ graph.displayNumber(graph.computeRecipeRequiredMachines(node)) }}
+                        <div class="required-number" *ngIf="isCraftingSiteNode(node)">
+                          x{{ graph.displayNumber(node.requiredMachines) }}
                         </div>
                       </div>
                       <button mat-button (click)="onNodeClick(node)">{{ node.label }}</button>
 
                       <div class="graph-button-container">
-                        <button mat-icon-button *ngIf="graph.isCraftingSiteNode(node)"
+                        <button mat-icon-button *ngIf="isCraftingSiteNode(node)"
                                 class="graph-button"
                                 aria-label="Remove recipe"
                                 matTooltip="Remove recipe"
                                 (click)="graph.removeSite(node)">
                           <mat-icon>close</mat-icon>
                         </button>
-                        <button mat-icon-button *ngIf="graph.isCraftingSiteNode(node) || graph.isExtractingSiteNode(node)"
+                        <button mat-icon-button *ngIf="isCraftingSiteNode(node) || isExtractingSiteNode(node)"
                                 class="graph-button"
                                 aria-label="Select node"
                                 matTooltip="Select node"
@@ -83,7 +81,7 @@
             </ng-template>
 
             <ng-template #linkTemplate let-link>
-              <svg:g class="edge">
+              <svg:g class="edge" >
                 <svg:path class="line" stroke-width="2" marker-end="url(#arrow)"></svg:path>
                 <svg:text class="edge-label" text-anchor="middle" style="fill: white"
                 >
@@ -93,8 +91,7 @@
                     [style.dominant-baseline]="link.dominantBaseline"
                     startOffset="50%"
                   >
-                    {{ this.graph.displayNumber(graph.computeLink(link) )}}
-                    {{ this.graph.isSourceCraftingSite(link) ? '' : '/ min' }}
+                    {{ this.graph.displayNumber(graph.computeLink(link) ) }} / min
                   </textPath>
                 </svg:text>
               </svg:g>

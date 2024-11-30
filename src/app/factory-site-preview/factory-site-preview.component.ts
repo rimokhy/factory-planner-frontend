@@ -21,6 +21,7 @@ import {FactoryRequirementsComponent} from "../factory-requirements/factory-requ
 import {isNil} from "lodash";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatTooltip} from "@angular/material/tooltip";
+import {isCraftingSiteNode, isExtractingSiteNode, isItemSiteNode} from "./graph/node.factory";
 
 
 @Component({
@@ -140,4 +141,8 @@ export class FactorySitePreviewComponent implements AfterViewInit {
 
     return this.graph.populate(graphResponse)
   }
+
+  protected readonly isItemSiteNode = isItemSiteNode;
+  protected readonly isCraftingSiteNode = isCraftingSiteNode;
+  protected readonly isExtractingSiteNode = isExtractingSiteNode;
 }
