@@ -1,7 +1,7 @@
 import {
   CraftingSiteNode,
   ExtractingSiteNode,
-  FactoryEdge,
+  FactoryEdge, FactoryNode,
   GraphBuilderFactoryNodeFactoryEdge,
   GraphBuilderFactoryNodeFactoryEdgeNodesInner
 } from "../../factory-planner-api";
@@ -32,6 +32,10 @@ export class GraphNavigator {
   async populate({nodes, edges}: GraphBuilderFactoryNodeFactoryEdge) {
     nodes.forEach((node: GraphBuilderFactoryNodeFactoryEdgeNodesInner) => {
       if (!this.isNodeExisting(node)) {
+        if (!this.isRequirement(node) && node.type === FactoryNode.TypeEnum.ItemSite) {
+          console.log('to add', node)
+
+        }
         this.nodes.push(createNode(node) as GraphNode);
       }
     })
@@ -300,4 +304,8 @@ export class GraphNavigator {
     return this.edges.some(e => e.source === edge.source && e.target === edge.target)
   }
 
+  clear() {
+    this.nodes = []
+    this.edges = []
+  }
 }

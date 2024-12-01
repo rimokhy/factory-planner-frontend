@@ -4,7 +4,12 @@ import {MatDivider} from "@angular/material/divider";
 import {MatCard, MatCardContent, MatCardFooter} from "@angular/material/card";
 import {MatList, MatListItem} from "@angular/material/list";
 import {MatIconButton} from "@angular/material/button";
-import {ItemDescriptorControllerService, ItemDescriptorDto} from "../factory-planner-api";
+import {
+  ItemDescriptorControllerService,
+  ItemDescriptorDto,
+  RecipeControllerService,
+  RecipeDto
+} from "../factory-planner-api";
 import {ItemDescriptorPickerComponent} from "../item-descriptor-picker/item-descriptor-picker.component";
 import {isEmpty, isNil} from "lodash";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -12,7 +17,7 @@ import {BehaviorSubject, lastValueFrom, Subject} from "rxjs";
 
 interface Tmp {
   item: BehaviorSubject<ItemDescriptorDto | null>;
-
+  recipe: BehaviorSubject<RecipeDto | null>;
   requiredAmount: BehaviorSubject<number>;
 }
 
@@ -41,6 +46,7 @@ export class FactoryRequirementsComponent {
     private readonly activatedRoute: ActivatedRoute,
     private readonly router: Router,
     private readonly itemDescriptorService: ItemDescriptorControllerService,
+    private readonly recipeService: RecipeControllerService,
   ) {
     this.activatedRoute.queryParamMap.subscribe(async params => {
       if (!isEmpty(this.requiredFactoryItems)) {
@@ -49,7 +55,13 @@ export class FactoryRequirementsComponent {
       const itemRequirements = params.getAll('factoryRequirement').map(e => JSON.parse(e))
 
       this.requiredFactoryItems = await Promise.all(itemRequirements.map(async e => {
-        return this.createFactoryItemRequirement(await lastValueFrom(this.itemDescriptorService.findByClassName1(e.itemClass)), e.requiredAmount)
+        let recipe: RecipeDto | null = null
+
+        if (e.recipeClass) {
+          console.log('ddddd', e.recipeClass)
+          recipe = await lastValueFrom(this.recipeService.findByClassName(e.recipeClass))
+        }
+        return this.createFactoryItemRequirement(await lastValueFrom(this.itemDescriptorService.findByClassName1(e.itemClass)), recipe, e.requiredAmount)
       }))
       this.valueChanged.emit(null)
       this.updateQueryParams()
@@ -57,11 +69,12 @@ export class FactoryRequirementsComponent {
   }
 
   addFactoryRequirement() {
-    return this.requiredFactoryItems.push(this.createFactoryItemRequirement(null))
+    return this.requiredFactoryItems.push(this.createFactoryItemRequirement(null, null))
   }
 
-  createFactoryItemRequirement(item: ItemDescriptorDto | null, amount: number = 0): Tmp {
+  createFactoryItemRequirement(item: ItemDescriptorDto | null, recipe: RecipeDto | null, amount: number = 0): Tmp {
     const newItem = new BehaviorSubject<ItemDescriptorDto | null>(item)
+    const newRecipe = new BehaviorSubject<RecipeDto | null>(recipe)
     const newAmount = new BehaviorSubject<number>(amount)
 
     newItem.subscribe(value => {
@@ -71,6 +84,13 @@ export class FactoryRequirementsComponent {
       this.updateQueryParams()
       this.valueChanged.emit(value)
     })
+    newRecipe.subscribe(value => {
+      if (isNil(value)) {
+        return
+      }
+      this.updateQueryParams()
+      this.valueChanged.emit(null)
+    })
     newAmount.subscribe(value => {
       this.updateQueryParams()
       this.valueChanged.emit(null)
@@ -79,6 +99,7 @@ export class FactoryRequirementsComponent {
 
     return {
       item: newItem,
+      recipe: newRecipe,
       requiredAmount: newAmount
     }
   }
@@ -90,6 +111,7 @@ export class FactoryRequirementsComponent {
       queryParams: {
         factoryRequirement: this.requiredFactoryItems.filter(e => !isNil(e.item)).map(e => JSON.stringify({
           itemClass: e.item.value?.className,
+          recipeClass: e.recipe.value?.className,
           requiredAmount: e.requiredAmount.value
         }))
       },

@@ -63,9 +63,10 @@ export class FactorySitePreviewComponent implements AfterViewInit {
   }
 
   async onRequirementsChanged() {
+    this.graph.clear()
     this.requirements?.requiredFactoryItems.forEach((req) => {
       if (!isNil(req.item.value)) {
-        this.populateGraph(this.makeItemSiteRequest(req.item.value.className))
+        this.populateGraph(this.makeItemSiteRequest(req.item.value?.className!!, req.recipe.value?.className))
       }
     })
   }
@@ -113,10 +114,11 @@ export class FactorySitePreviewComponent implements AfterViewInit {
     throw new Error('Unhandled node type');
   }
 
-  private makeItemSiteRequest(itemClass: string): ItemSiteRequest {
+  private makeItemSiteRequest(itemClass: string, recipeClass?: string): ItemSiteRequest {
     return {
       type: FactorySiteRequest.TypeEnum.ItemSite,
       itemClass: itemClass,
+      recipeClass
     }
   }
 
@@ -142,7 +144,7 @@ export class FactorySitePreviewComponent implements AfterViewInit {
     return this.graph.populate(graphResponse)
   }
 
-  protected readonly isItemSiteNode = isItemSiteNode;
-  protected readonly isCraftingSiteNode = isCraftingSiteNode;
+  readonly isItemSiteNode = isItemSiteNode;
+  readonly isCraftingSiteNode = isCraftingSiteNode;
   protected readonly isExtractingSiteNode = isExtractingSiteNode;
 }

@@ -17,7 +17,10 @@
           <mat-option [value]="option">{{ option.displayName }}</mat-option>
         }
       </mat-autocomplete>
+
     </mat-form-field>
+    <app-recipe-picker [itemSelected]="itemSelected" [recipeSelected]="recipeSelected"></app-recipe-picker>
+
   </div>
 
   <div class="required-amount-input-container">

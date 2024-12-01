@@ -2,7 +2,7 @@
   <mat-card-content>
     <mat-list>
       @for (factoryRequirement of requiredFactoryItems; track factoryRequirement) {
-        <app-item-descriptor-picker [itemSelected]="factoryRequirement.item" [amountSelected]="factoryRequirement.requiredAmount" ></app-item-descriptor-picker>
+        <app-item-descriptor-picker [itemSelected]="factoryRequirement.item" [recipeSelected]="factoryRequirement.recipe" [amountSelected]="factoryRequirement.requiredAmount" ></app-item-descriptor-picker>
       }
     </mat-list>
   </mat-card-content>

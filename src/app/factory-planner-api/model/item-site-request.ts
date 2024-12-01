@@ -12,6 +12,7 @@ import { FactorySiteRequest } from './factory-site-request';
 
 
 export interface ItemSiteRequest extends FactorySiteRequest { 
+    recipeClass?: string;
 }
 export namespace ItemSiteRequest {
 }

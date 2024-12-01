@@ -13,8 +13,7 @@
 export interface FactoryEdge {
     source: string;
     target: string;
-    manufacturingDuration?: number;
     outputPerCycle?: number;
-    totalOutputPerMinute?: number;
+  totalOutputPerMinute?: number;
 }
 

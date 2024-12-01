@@ -1,10 +1,10 @@
-import {ChangeDetectionStrategy, Component, effect, input, model, output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input, model, OnInit} from '@angular/core';
 import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {FormsModule} from '@angular/forms';
-import {ItemDescriptorDto, RecipeControllerService, RecipeRequiringDto} from "../factory-planner-api";
-import {BehaviorSubject, lastValueFrom, Subject} from "rxjs";
+import {ItemDescriptorDto, RecipeControllerService, RecipeDto, RecipeRequiringDto} from "../factory-planner-api";
+import {BehaviorSubject, lastValueFrom} from "rxjs";
 import {AsyncPipe, NgIf} from "@angular/common";
 
 
@@ -18,10 +18,10 @@ import {AsyncPipe, NgIf} from "@angular/common";
   changeDetection: ChangeDetectionStrategy.OnPush,
 
 })
-export class RecipePickerComponent {
-  readonly item = input.required<ItemDescriptorDto>();
+export class RecipePickerComponent implements OnInit {
+  @Input() itemSelected!: BehaviorSubject<ItemDescriptorDto | null>;
+  @Input() recipeSelected!: BehaviorSubject<RecipeDto | null>;
   selectedRecipeClass = model<string>()
-  selectedRecipe = output<RecipeRequiringDto>()
   recipes = new BehaviorSubject<RecipeRequiringDto[]>([])
 
   constructor(
@@ -31,17 +31,23 @@ export class RecipePickerComponent {
       const recipe = this.recipes.value.find(e => e.className === recipeClass)
 
       if (recipe) {
-        this.selectedRecipe.emit(recipe);
+        this.recipeSelected.next(recipe);
       } else {
         console.warn(`Supposed to emit recipe ${recipeClass}, but wasnt found in options`)
       }
     })
-    effect(async () => {
-      const itemRecipes = await lastValueFrom(this.recipeService.findAllByProducedItem(this.item().className))
+  }
 
-/*
-      this.recipes.next(itemRecipes)
-*/
+  ngOnInit(): void {
+    this.itemSelected.subscribe(async item => {
+      if (item?.className) {
+        this.recipes.next(await lastValueFrom(this.recipeService.findAllByProducedItem(item?.className)))
+      }
+    })
+    this.recipeSelected.subscribe(recipe => {
+      if (recipe) {
+        this.selectedRecipeClass.set(recipe.className)
+      }
     })
   }
 

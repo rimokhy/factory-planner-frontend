@@ -2,18 +2,19 @@ import {Component, Input, model, OnInit} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {ItemDescriptorControllerService, ItemDescriptorDto} from "../factory-planner-api";
+import {ItemDescriptorControllerService, ItemDescriptorDto, RecipeDto} from "../factory-planner-api";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {AsyncPipe, NgIf, NgOptimizedImage} from "@angular/common";
 import {BehaviorSubject, lastValueFrom, Observable, startWith, switchMap} from "rxjs";
 import {MatDivider} from "@angular/material/divider";
 import {MatIcon} from "@angular/material/icon";
 import {isNil} from "lodash";
+import {RecipePickerComponent} from "../recipe-picker/recipe-picker.component";
 
 @Component({
   selector: 'app-item-descriptor-picker',
   standalone: true,
-  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, ReactiveFormsModule, AsyncPipe, MatDivider, NgIf, NgOptimizedImage, MatIcon,],
+  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, ReactiveFormsModule, AsyncPipe, MatDivider, NgIf, NgOptimizedImage, MatIcon, RecipePickerComponent,],
   templateUrl: './item-descriptor-picker.component.html',
   styleUrl: './item-descriptor-picker.component.scss'
 })
@@ -22,6 +23,7 @@ export class ItemDescriptorPickerComponent implements OnInit {
   filteredOptions!: Observable<ItemDescriptorDto[]>;
   itemNumberFormControl = new FormControl<number | null>(null);
   @Input() itemSelected!: BehaviorSubject<ItemDescriptorDto | null>;
+  @Input() recipeSelected!: BehaviorSubject<RecipeDto | null>;
   @Input() amountSelected!: BehaviorSubject<number>;
 
   constructor(
