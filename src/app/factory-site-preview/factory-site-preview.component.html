@@ -43,7 +43,7 @@
                         <xhtml:img [matTooltip]="getNodeTooltip(node)" [class]="'png-icon'"
                                    [attr.src]="getNodeIcon(node)"></xhtml:img>
                         <div class="required-number" *ngIf="isItemSiteNode(node)">
-                          x{{ graph.displayNumber(node.requiredAmountPerMinute) }}
+                          x{{ graph.displayNumber(graph.getItemNumberDisplay(node)) }}
                         </div>
                         <div class="required-number" *ngIf="isCraftingSiteNode(node)">
                           x{{ graph.displayNumber(node.requiredMachines) }}

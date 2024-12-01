@@ -12,6 +12,7 @@ import {BehaviorSubject, lastValueFrom, Subject} from "rxjs";
 
 interface Tmp {
   item: BehaviorSubject<ItemDescriptorDto | null>;
+
   requiredAmount: BehaviorSubject<number>;
 }
 

@@ -39,3 +39,5 @@ export const createNode = (node: Node): FactoryNode => {
   }
   throw new Error('wouf')
 }
+
+export const dfs = (start: Node, end: Node) => {}
