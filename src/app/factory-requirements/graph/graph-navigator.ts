@@ -86,6 +86,49 @@ export class GraphNavigator {
   getItemNumberDisplay(node: ItemSiteNodeImpl) {
     return this.getTotalItemProducedItems(node);
   }
+
+  actualizeGraph() {
+    this.edges.forEach(edge => {
+      edge.totalOutputPerMinute = 0
+    })
+    this.nodes
+      .filter(item => this.isRequirement(item))
+      .filter(item => item instanceof ItemSiteNodeImpl)
+      .forEach((item) => {
+        // Get item requirements from user
+
+        this.computeItemRequirement(item, this.getRequiredTotal(item.factorySiteTarget.className))
+      })
+    this.edges.forEach(edge => {
+      const actual = this.computeLink(edge)
+
+      if (actual !== undefined) {
+        edge.totalOutputPerMinute = actual
+      }
+    })
+    this.nodes.filter(item => item instanceof ItemSiteNodeImpl)
+      .forEach(item => {
+        const requirements = this.getTotalItemRequiredItems(item)
+        const produced = this.getTotalItemProducedItems(item)
+
+        if (produced < requirements) {
+          const recipes = this.getIncomingEdges(item)
+
+          recipes.forEach(recipeEdge => {
+            const recipe = this.nodes.find(recipeNode => recipeNode.id === recipeEdge.source) as CraftingSiteNodeImpl
+            this.computeRecipe(recipe, item, requirements, recipeEdge)
+          })
+        }
+      })
+    this.edges.forEach(edge => {
+      const actual = this.computeLink(edge)
+
+      if (actual !== undefined) {
+        edge.totalOutputPerMinute = actual
+      }
+    })
+  }
+
   private computeRecipeRequiredMachines(recipe: CraftingSiteNodeImpl, productItem: ItemSiteNodeImpl, amountPerCycle: number): number {
     const recipeToItem = this.getOutgoingEdge(recipe).find(e => e.target === productItem?.id && e.source === recipe.id);
 
@@ -139,48 +182,6 @@ export class GraphNavigator {
       const recipe = this.nodes.find(recipeNode => recipeNode.id === recipeEdge.source)
 
       if (recipe instanceof CraftingSiteNodeImpl) this.computeRecipe(recipe, item, requiredTotalPerMinute, recipeEdge, callstack)
-    })
-  }
-
-  private actualizeGraph() {
-    this.edges.forEach(edge => {
-      edge.totalOutputPerMinute = 0
-    })
-    this.nodes
-      .filter(item => this.isRequirement(item))
-      .filter(item => item instanceof ItemSiteNodeImpl)
-      .forEach((item) => {
-        // Get item requirements from user
-
-        this.computeItemRequirement(item, this.getRequiredTotal(item.factorySiteTarget.className))
-      })
-    this.edges.forEach(edge => {
-      const actual = this.computeLink(edge)
-
-      if (actual !== undefined) {
-        edge.totalOutputPerMinute = actual
-      }
-    })
-    this.nodes.filter(item => item instanceof ItemSiteNodeImpl)
-      .forEach(item => {
-        const requirements = this.getTotalItemRequiredItems(item)
-        const produced = this.getTotalItemProducedItems(item)
-
-        if (produced < requirements) {
-          const recipes = this.getIncomingEdges(item)
-
-          recipes.forEach(recipeEdge => {
-            const recipe = this.nodes.find(recipeNode => recipeNode.id === recipeEdge.source) as CraftingSiteNodeImpl
-            this.computeRecipe(recipe, item, requirements, recipeEdge)
-          })
-        }
-      })
-    this.edges.forEach(edge => {
-      const actual = this.computeLink(edge)
-
-      if (actual !== undefined) {
-        edge.totalOutputPerMinute = actual
-      }
     })
   }
 

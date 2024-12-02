@@ -151,7 +151,7 @@ export class FactoryRequirementsComponent {
       this.updateQueryParams()
     })
     newAmount.subscribe(value => {
-      this.onRequirementChanged()
+      this.graphSubject.value?.actualizeGraph()
       this.updateQueryParams()
     })
 
