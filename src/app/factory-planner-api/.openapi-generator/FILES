@@ -23,13 +23,13 @@ model/extractor-dto.ts
 model/factory-edge.ts
 model/factory-node.ts
 model/factory-site-request.ts
-model/graph-builder-factory-node-factory-edge-nodes-inner.ts
-model/graph-builder-factory-node-factory-edge.ts
+model/graph-factory-node-factory-edge-nodes-inner.ts
+model/graph-factory-node-factory-edge.ts
 model/item-descriptor-dto.ts
 model/item-site-node.ts
 model/item-site-request.ts
 model/models.ts
-model/plan-factory-site-request.ts
+model/plan-factory-site-request-inner.ts
 model/recipe-dto.ts
 model/recipe-io-dto.ts
 model/recipe-producing-dto.ts

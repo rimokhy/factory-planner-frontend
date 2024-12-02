@@ -1,27 +1,18 @@
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
-import {lastValueFrom, Subject} from "rxjs";
+import {Component, ViewChild} from '@angular/core';
+import {BehaviorSubject, Subject} from "rxjs";
 import {NgxGraphModule} from "@swimlane/ngx-graph";
 import {AsyncPipe, NgIf} from "@angular/common";
-import {
-  CraftingSiteNode,
-  CraftingSiteRequest,
-  ExtractingSiteNode,
-  ExtractingSiteRequest,
-  FactoryNode,
-  FactoryPlannerControllerService,
-  FactorySiteRequest,
-  ItemSiteRequest
-} from "../factory-planner-api";
+import {CraftingSiteNode, ExtractingSiteNode, FactoryNode} from "../factory-planner-api";
 import {MatCard, MatCardContent, MatCardFooter} from "@angular/material/card";
 import {MatIcon} from "@angular/material/icon";
-import {GraphNavigator, GraphNode} from "./graph/graph-navigator";
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {MatDivider} from "@angular/material/divider";
 import {FactoryRequirementsComponent} from "../factory-requirements/factory-requirements.component";
-import {isNil} from "lodash";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatTooltip} from "@angular/material/tooltip";
-import {isCraftingSiteNode, isExtractingSiteNode, isItemSiteNode} from "./graph/node.factory";
+import {GraphNavigator, GraphNode} from "../factory-requirements/graph/graph-navigator";
+import {isCraftingSiteNode, isExtractingSiteNode, isItemSiteNode } from '../factory-requirements/graph/node.factory';
+import {isNil} from "lodash";
 
 
 @Component({
@@ -46,35 +37,37 @@ import {isCraftingSiteNode, isExtractingSiteNode, isItemSiteNode} from "./graph/
   templateUrl: './factory-site-preview.component.html',
   styleUrl: './factory-site-preview.component.scss'
 })
-export class FactorySitePreviewComponent implements AfterViewInit {
+export class FactorySitePreviewComponent {
   updateGraph: Subject<boolean> = new Subject();
-  graph = new GraphNavigator(this.updateGraph)
+  graphSubject = new BehaviorSubject<GraphNavigator | null>(null)
   @ViewChild(FactoryRequirementsComponent) requirements!: FactoryRequirementsComponent;
 
+  readonly isItemSiteNode = isItemSiteNode;
+  readonly isCraftingSiteNode = isCraftingSiteNode;
+  protected readonly isExtractingSiteNode = isExtractingSiteNode;
 
-  constructor(
-    private readonly factoryPlannerControllerService: FactoryPlannerControllerService,
-  ) {
-
-  }
-
-  ngAfterViewInit(): void {
-    this.graph.requirements = this.requirements;
-  }
-
-  async onRequirementsChanged() {
-    this.graph.clear()
-    this.requirements?.requiredFactoryItems.forEach((req) => {
-      if (!isNil(req.item.value)) {
-        this.populateGraph(this.makeItemSiteRequest(req.item.value?.className!!, req.recipe.value?.className))
+  constructor() {
+    this.graphSubject.subscribe(e => {
+      if (isNil(e)) {
+        return
       }
+
+      this.updateGraph.next(true);
     })
   }
 
   async onNodeClick(nodeClicked: GraphNode) {
-    const request = this.makeFactorySiteRequest(nodeClicked)
+    const graph = this.graphSubject.value
 
-    return this.populateGraph(request)
+    if (isNil(graph)) {
+      return
+    }
+    if (isItemSiteNode(nodeClicked) && this.requirements.getSealedRequirements().every(e => e.item.className !== nodeClicked.factorySiteTarget.className)) {
+      console.log('Clicked',nodeClicked.factorySiteTarget)
+      this.requirements.addFactoryRequirement(nodeClicked.factorySiteTarget)
+      this.requirements.onRequirementChanged()
+      this.requirements.updateQueryParams()
+    }
   }
 
   getNodeIcon(node: GraphNode): string | undefined {
@@ -100,51 +93,4 @@ export class FactorySitePreviewComponent implements AfterViewInit {
     }
     return undefined
   }
-
-  private makeFactorySiteRequest(nodeClicked: GraphNode): FactorySiteRequest {
-    switch (nodeClicked.type) {
-      case FactoryNode.TypeEnum.ItemSite:
-        return this.makeItemSiteRequest(nodeClicked.factorySiteTarget.className);
-      case FactoryNode.TypeEnum.CraftingSite:
-        return this.makeCraftingSiteRequest(nodeClicked.factorySiteTarget.className, (nodeClicked as CraftingSiteNode).recipe.className);
-      case FactoryNode.TypeEnum.ExtractorSite:
-        return this.makeExtractingSiteRequest(nodeClicked.factorySiteTarget.className, (nodeClicked as ExtractingSiteNode).automaton.className)
-    }
-    console.error('Unhandled node type', nodeClicked);
-    throw new Error('Unhandled node type');
-  }
-
-  private makeItemSiteRequest(itemClass: string, recipeClass?: string): ItemSiteRequest {
-    return {
-      type: FactorySiteRequest.TypeEnum.ItemSite,
-      itemClass: itemClass,
-      recipeClass
-    }
-  }
-
-  private makeCraftingSiteRequest(itemClass: string, recipeClass: string): CraftingSiteRequest {
-    return {
-      type: FactorySiteRequest.TypeEnum.CraftingSite,
-      itemClass: itemClass,
-      recipeClass: recipeClass,
-    }
-  }
-
-  private makeExtractingSiteRequest(itemClass: string, extractorClass: string): ExtractingSiteRequest {
-    return {
-      type: FactorySiteRequest.TypeEnum.ExtractorSite,
-      itemClass: itemClass,
-      extractorClass: extractorClass,
-    }
-  }
-
-  private async populateGraph(request: FactorySiteRequest) {
-    const graphResponse = await lastValueFrom(this.factoryPlannerControllerService.planFactorySite(request))
-
-    return this.graph.populate(graphResponse)
-  }
-
-  readonly isItemSiteNode = isItemSiteNode;
-  readonly isCraftingSiteNode = isCraftingSiteNode;
-  protected readonly isExtractingSiteNode = isExtractingSiteNode;
 }

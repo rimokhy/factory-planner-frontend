@@ -17,8 +17,8 @@ import { ExtractorDto } from './extractor-dto';
 
 
 /**
- * @type GraphBuilderFactoryNodeFactoryEdgeNodesInner
+ * @type GraphFactoryNodeFactoryEdgeNodesInner
  * @export
  */
-export type GraphBuilderFactoryNodeFactoryEdgeNodesInner = CraftingSiteNode | ExtractingSiteNode | ItemSiteNode;
+export type GraphFactoryNodeFactoryEdgeNodesInner = CraftingSiteNode | ExtractingSiteNode | ItemSiteNode;
 

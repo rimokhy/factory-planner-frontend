@@ -1,15 +1,12 @@
 import {
   CraftingSiteNode,
-  ExtractingSiteNode,
-  FactoryEdge, FactoryNode,
-  GraphBuilderFactoryNodeFactoryEdge,
-  GraphBuilderFactoryNodeFactoryEdgeNodesInner
+  FactoryEdge,
+  GraphFactoryNodeFactoryEdge,
+  GraphFactoryNodeFactoryEdgeNodesInner,
 } from "../../factory-planner-api";
-import {ClusterNode, Edge, Node} from "@swimlane/ngx-graph";
-import {isEmpty, isNil, max, partition, sum} from "lodash";
-import {FactoryRequirementsComponent} from "../../factory-requirements/factory-requirements.component";
-import {Subject} from "rxjs";
-import {createNode, isCraftingSiteNode, isItemSiteNode} from "./node.factory";
+import {Edge, Node} from "@swimlane/ngx-graph";
+import {isNil, max, sum} from "lodash";
+import {createNode, isCraftingSiteNode, isItemSiteNode, SealedRequirement} from "./node.factory";
 import {CraftingSiteNodeImpl} from "./crafting-site.node";
 import {ItemSiteNodeImpl} from "./item-site.node";
 import {ExtractingSiteNodeImpl} from "./extracting-site.node";
@@ -22,70 +19,34 @@ export type GraphEdge = Edge & FactoryEdge;
 export class GraphNavigator {
   nodes: GraphNode[] = [];
   edges: GraphEdge[] = [];
-  clusters: ClusterNode[] = [];
-  requirements?: FactoryRequirementsComponent
 
-  constructor(private readonly updateGraphSubject: Subject<boolean>) {
+  constructor(private readonly requirements: SealedRequirement[]) {
 
   }
 
-  async populate({nodes, edges}: GraphBuilderFactoryNodeFactoryEdge) {
-    nodes.forEach((node: GraphBuilderFactoryNodeFactoryEdgeNodesInner) => {
+  populate({nodes, edges}: GraphFactoryNodeFactoryEdge) {
+    nodes.forEach((node) => {
       if (!this.isNodeExisting(node)) {
-        if (!this.isRequirement(node) && node.type === FactoryNode.TypeEnum.ItemSite) {
-          console.log('to add', node)
-
-        }
         this.nodes.push(createNode(node) as GraphNode);
       }
     })
 
     edges.forEach(edge => {
-      const existing = this.edges.find(e => e.source === edge.source && e.target === edge.target)
-      if (!existing) {
+      if (!this.isEdgeExisting(edge)) {
         this.edges.push(edge);
       }
+
     })
 
 
     this.actualizeGraph()
-    this.updateGraphSubject.next(true)
-  }
-
-  selectSite(node: CraftingSiteNode | ExtractingSiteNode) {
-    const outgoing = this.getOutgoingEdge(node)
-
-    outgoing.forEach(edge => {
-      const destination = this.nodes.find(e => e.id === edge.target)
-
-      if (destination) {
-        const targetIncoming = this.getIncomingEdges(destination).filter(edge => edge.source !== node.id)
-
-        targetIncoming.forEach(targetEdge => {
-          const source = this.nodes.find(e => e.id === targetEdge.source)
-
-          if (source) {
-            this.removeSite(source)
-          }
-        })
-      }
-
-    })
-
-    this.flushGraph()
-  }
-
-  removeSite(node: GraphNode) {
-    // TODO remove parent site if useless
-    this.disconnectSite(node)
-    this.flushGraph()
   }
 
   getRequiredTotal(className: string): number {
-    const requirements = this.requirements?.requiredFactoryItems.filter(e => !isNil(e.item.value) && e.item.value.className === className)
+    const requirements = this.requirements.filter(e => !isNil(e.item) && e.item.className === className)
 
-    return sum(requirements?.map(edge => {
-      return edge.requiredAmount.value;
+    return sum(requirements?.map(req => {
+      return req.requiredAmount;
     }));
   }
 
@@ -125,16 +86,6 @@ export class GraphNavigator {
   getItemNumberDisplay(node: ItemSiteNodeImpl) {
     return this.getTotalItemProducedItems(node);
   }
-
-  private disconnectSite(node: GraphNode) {
-    const connections = [
-      ...this.getOutgoingEdge(node),
-      ...this.getIncomingEdges(node)
-    ].map(e => e.id);
-
-    this.edges = this.edges.filter(edge => !connections.includes(edge.id));
-  }
-
   private computeRecipeRequiredMachines(recipe: CraftingSiteNodeImpl, productItem: ItemSiteNodeImpl, amountPerCycle: number): number {
     const recipeToItem = this.getOutgoingEdge(recipe).find(e => e.target === productItem?.id && e.source === recipe.id);
 
@@ -223,7 +174,6 @@ export class GraphNavigator {
             this.computeRecipe(recipe, item, requirements, recipeEdge)
           })
         }
-        console.log(item.id, requirements, produced)
       })
     this.edges.forEach(edge => {
       const actual = this.computeLink(edge)
@@ -234,35 +184,13 @@ export class GraphNavigator {
     })
   }
 
-  private flushGraph() {
-    const [remaining, rest] = partition(this.nodes, node => {
-      if (this.isRequirement(node)) {
-        return true
-      }
-      if (isEmpty(this.getOutgoingEdge(node)) && isEmpty(this.getIncomingEdges(node))) {
-        return false
-      }
-
-
-      // TODO see for extracting site
-
-      return true
-    })
-
-    rest.forEach(e => {
-      this.disconnectSite(e)
-    })
-    this.nodes = remaining
-    this.actualizeGraph()
-  }
-
   private isRequirement(node: GraphNode | string): boolean {
     if (!this.requirements) {
       return true
     }
     const nodeId = (typeof node === 'string') ? node : node.id
 
-    return this.requirements.requiredFactoryItems.some(requirement => requirement.item.value?.className === nodeId)
+    return this.requirements.some(requirement => requirement.item?.className === nodeId)
   }
 
   private cycleToMinute(site: CraftingSiteNode, amount: number): number {
@@ -271,7 +199,7 @@ export class GraphNavigator {
 
       return amount * cyclePerMinute
     } catch (error) {
-      console.log(site.type, site.id, 'error')
+      console.warn(site.type, site.id, 'error')
       return -1
     }
 
@@ -283,29 +211,24 @@ export class GraphNavigator {
 
       return amount / cyclePerMinute
     } catch (error) {
-      console.log(site.type, site.id, 'error')
+      console.warn(site.type, site.id, 'error')
       return -1
     }
   }
 
-  private getOutgoingEdge(node: GraphBuilderFactoryNodeFactoryEdgeNodesInner): GraphEdge[] {
+  private getOutgoingEdge(node: GraphFactoryNodeFactoryEdgeNodesInner): GraphEdge[] {
     return this.edges.filter(edge => edge.source === node.id)
   }
 
-  private getIncomingEdges(node: GraphBuilderFactoryNodeFactoryEdgeNodesInner): GraphEdge[] {
+  private getIncomingEdges(node: GraphFactoryNodeFactoryEdgeNodesInner): GraphEdge[] {
     return this.edges.filter(edge => edge.target === node.id)
   }
 
-  private isNodeExisting(node: GraphBuilderFactoryNodeFactoryEdgeNodesInner): boolean {
+  private isNodeExisting(node: GraphFactoryNodeFactoryEdgeNodesInner): boolean {
     return this.nodes.some(e => e.id === node.id)
   }
 
   private isEdgeExisting(edge: FactoryEdge): boolean {
     return this.edges.some(e => e.source === edge.source && e.target === edge.target)
-  }
-
-  clear() {
-    this.nodes = []
-    this.edges = []
   }
 }

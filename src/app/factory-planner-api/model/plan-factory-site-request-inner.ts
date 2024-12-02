@@ -14,8 +14,8 @@ import { CraftingSiteRequest } from './crafting-site-request';
 
 
 /**
- * @type PlanFactorySiteRequest
+ * @type PlanFactorySiteRequestInner
  * @export
  */
-export type PlanFactorySiteRequest = CraftingSiteRequest | ExtractingSiteRequest | ItemSiteRequest;
+export type PlanFactorySiteRequestInner = CraftingSiteRequest | ExtractingSiteRequest | ItemSiteRequest;
 

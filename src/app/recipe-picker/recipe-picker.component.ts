@@ -3,7 +3,13 @@ import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {FormsModule} from '@angular/forms';
-import {ItemDescriptorDto, RecipeControllerService, RecipeDto, RecipeRequiringDto} from "../factory-planner-api";
+import {
+  ExtractorDto,
+  ItemDescriptorDto,
+  RecipeControllerService,
+  RecipeDto,
+  RecipeRequiringDto
+} from "../factory-planner-api";
 import {BehaviorSubject, lastValueFrom} from "rxjs";
 import {AsyncPipe, NgIf} from "@angular/common";
 
@@ -20,7 +26,7 @@ import {AsyncPipe, NgIf} from "@angular/common";
 })
 export class RecipePickerComponent implements OnInit {
   @Input() itemSelected!: BehaviorSubject<ItemDescriptorDto | null>;
-  @Input() recipeSelected!: BehaviorSubject<RecipeDto | null>;
+  @Input() recipeSelected!: BehaviorSubject<RecipeDto | ExtractorDto | null>;
   selectedRecipeClass = model<string>()
   recipes = new BehaviorSubject<RecipeRequiringDto[]>([])
 
@@ -29,9 +35,14 @@ export class RecipePickerComponent implements OnInit {
   ) {
     this.selectedRecipeClass.subscribe(recipeClass => {
       const recipe = this.recipes.value.find(e => e.className === recipeClass)
+      const extractors = Array.from(this.itemSelected.value?.extractedIn || [])
+      const extractor = extractors.find(e => e.className === recipeClass)
+
 
       if (recipe) {
         this.recipeSelected.next(recipe);
+      } else if (extractor) {
+        this.recipeSelected.next(extractor);
       } else {
         console.warn(`Supposed to emit recipe ${recipeClass}, but wasnt found in options`)
       }

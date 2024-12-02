@@ -14,8 +14,8 @@ import { ItemDescriptorDto } from './item-descriptor-dto';
 export interface FactoryNode { 
     type: FactoryNode.TypeEnum;
     factorySiteTarget: ItemDescriptorDto;
-    id: string;
     label: string;
+    id: string;
 }
 export namespace FactoryNode {
     export type TypeEnum = 'ExtractorSite' | 'CraftingSite' | 'ItemSite';

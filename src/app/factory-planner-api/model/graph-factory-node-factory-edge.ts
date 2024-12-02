@@ -9,11 +9,11 @@
  * Do not edit the class manually.
  */
 import { FactoryEdge } from './factory-edge';
-import { GraphBuilderFactoryNodeFactoryEdgeNodesInner } from './graph-builder-factory-node-factory-edge-nodes-inner';
+import { GraphFactoryNodeFactoryEdgeNodesInner } from './graph-factory-node-factory-edge-nodes-inner';
 
 
-export interface GraphBuilderFactoryNodeFactoryEdge { 
-    nodes: Set<GraphBuilderFactoryNodeFactoryEdgeNodesInner>;
+export interface GraphFactoryNodeFactoryEdge { 
+    nodes: Set<GraphFactoryNodeFactoryEdgeNodesInner>;
     edges: Set<FactoryEdge>;
 }
 

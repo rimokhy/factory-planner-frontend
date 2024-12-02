@@ -1,4 +1,10 @@
-import {CraftingSiteNode, ExtractingSiteNode, FactoryNode, ItemSiteNode} from "../../factory-planner-api";
+import {
+  CraftingSiteNode,
+  ExtractingSiteNode, ExtractorDto,
+  FactoryNode,
+  ItemDescriptorDto,
+  ItemSiteNode, RecipeDto
+} from "../../factory-planner-api";
 import {CraftingSiteNodeImpl} from "./crafting-site.node";
 import {ExtractingSiteNodeImpl} from "./extracting-site.node";
 import {ItemSiteNodeImpl} from "./item-site.node";
@@ -40,4 +46,8 @@ export const createNode = (node: Node): FactoryNode => {
   throw new Error('wouf')
 }
 
-export const dfs = (start: Node, end: Node) => {}
+export interface SealedRequirement {
+  item: ItemDescriptorDto;
+  manufacturing?: RecipeDto | ExtractorDto;
+  requiredAmount: number;
+}
