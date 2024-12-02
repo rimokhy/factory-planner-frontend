@@ -10,11 +10,12 @@ import {MatDivider} from "@angular/material/divider";
 import {MatIcon} from "@angular/material/icon";
 import {isNil} from "lodash";
 import {RecipePickerComponent} from "../recipe-picker/recipe-picker.component";
+import {MatIconButton, MatMiniFabButton} from "@angular/material/button";
 
 @Component({
   selector: 'app-item-descriptor-picker',
   standalone: true,
-  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, ReactiveFormsModule, AsyncPipe, MatDivider, NgIf, NgOptimizedImage, MatIcon, RecipePickerComponent,],
+  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, ReactiveFormsModule, AsyncPipe, MatDivider, NgIf, NgOptimizedImage, MatIcon, RecipePickerComponent],
   templateUrl: './item-descriptor-picker.component.html',
   styleUrl: './item-descriptor-picker.component.scss'
 })

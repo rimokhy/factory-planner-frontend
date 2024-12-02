@@ -2,105 +2,8 @@
   <div class="factory-preview-content">
     <mat-tab-group>
       <mat-tab label="Graph view">
-        <div>
-          @if (graphSubject | async; as graph) {
-            <ngx-graph
-              class=" graph-preview"
-              [links]="graph.edges"
-              [nodes]="graph.nodes"
-              [update$]="updateGraph"
-              layout="dagre"
-            >
-              <ng-template #defsTemplate>
-                <svg:marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="4" markerHeight="4"
-                            orient="auto">
-                  <svg:path d="M0,-5L10,0L0,5" class="arrow-head" fill="white"/>
-                </svg:marker>
-              </ng-template>
 
-              <ng-template #clusterTemplate let-cluster>
-                <svg:g class="node cluster">
-                  <svg:text alignment-baseline="top" [attr.x]="10" [attr.y]="cluster.dimension.height / 2">
-                    {{ cluster.label }}
-                  </svg:text>
-                  <svg:rect
-                    rx="5"
-                    ry="5"
-                    [attr.width]="cluster.dimension.width"
-                    [attr.height]="cluster.dimension.height"
-                    [attr.fill]="cluster.data.color"
-                  />
-                </svg:g>
-              </ng-template>
-
-              <ng-template #nodeTemplate let-node>
-
-                <svg:g>
-                  <svg:foreignObject [attr.width]="250" [attr.height]="100">
-                    <mat-card appearance="outlined" style="width: 250px; height: 100px">
-                      <mat-card-content class="graph-content-container">
-                        <div class="graph-image-container">
-                          <xhtml:img [matTooltip]="getNodeTooltip(node)" [class]="'png-icon'"
-                                     [attr.src]="getNodeIcon(node)"></xhtml:img>
-                          <div class="required-number" *ngIf="isItemSiteNode(node)">
-                            x{{ graph.displayNumber(graph.getItemNumberDisplay(node)) }}
-                          </div>
-                          <div class="required-number" *ngIf="isCraftingSiteNode(node)">
-                            x{{ graph.displayNumber(node.requiredMachines) }}
-                          </div>
-                        </div>
-                        <button mat-button (click)="onNodeClick(node)">{{ node.label }}</button>
-                        <!-- TODO Do we really want to select recipe from graph?
-                                                <div class="graph-button-container">
-                                                  <button mat-icon-button *ngIf="isCraftingSiteNode(node)"
-                                                          class="graph-button"
-                                                          aria-label="Remove recipe"
-                                                          matTooltip="Remove recipe"
-                                                          (click)="graph.removeSite(node)">
-                                                    <mat-icon>close</mat-icon>
-                                                  </button>
-
-                                                  <button mat-icon-button *ngIf="isCraftingSiteNode(node) || isExtractingSiteNode(node)"
-                                                          class="graph-button"
-                                                          aria-label="Select node"
-                                                          matTooltip="Select node"
-                                                          (click)="graph.selectSite(node)">
-                                                    <mat-icon>add_task</mat-icon>
-                                                  </button>
-                        </div>
-                        -->
-                      </mat-card-content>
-                    </mat-card>
-
-                    <div>
-
-
-                    </div>
-                  </svg:foreignObject>
-
-
-                </svg:g>
-              </ng-template>
-
-              <ng-template #linkTemplate let-link>
-                <svg:g class="edge" >
-                  <svg:path class="line" stroke-width="2" marker-end="url(#arrow)"></svg:path>
-                  <svg:text class="edge-label" text-anchor="middle" style="fill: white"
-                  >
-                    <textPath
-                      class="text-path"
-                      [attr.href]="'#' + link.id"
-                      [style.dominant-baseline]="link.dominantBaseline"
-                      startOffset="50%"
-                    >
-                      {{ this.graph.displayNumber(graph.computeLink(link) ) }} / min
-                    </textPath>
-                  </svg:text>
-                </svg:g>
-              </ng-template>
-            </ngx-graph>
-          }
-        </div>
+        <app-factory-graph [graphSubject]="graphSubject" [requirements]="requirements" [updateGraphSubject]="updateGraphSubject"></app-factory-graph>
 
       </mat-tab>
       <mat-tab label="List view"> Content 2</mat-tab>
@@ -108,7 +11,7 @@
   </div>
 
   <div class="factory-requirements-content">
-    <app-factory-requirements [graphSubject]="graphSubject"></app-factory-requirements>
+    <app-factory-requirements [graphSubject]="graphSubject" [updateGraphSubject]="updateGraphSubject"></app-factory-requirements>
   </div>
 </div>
 

@@ -19,7 +19,7 @@ import {
 import {ItemDescriptorPickerComponent} from "../item-descriptor-picker/item-descriptor-picker.component";
 import {isEmpty, isNil} from "lodash";
 import {ActivatedRoute, Router} from "@angular/router";
-import {BehaviorSubject, lastValueFrom} from "rxjs";
+import {BehaviorSubject, lastValueFrom, Subject} from "rxjs";
 import {GraphNavigator} from "./graph/graph-navigator";
 import {SealedRequirement} from "./graph/node.factory";
 
@@ -37,10 +37,10 @@ interface Requirements {
   requiredAmount: BehaviorSubject<number>;
 }
 
-export const isExtractor = (recipeOrExtractor: RecipeDto | ExtractorDto | null): recipeOrExtractor is ExtractorDto => {
+export const isExtractor = (recipeOrExtractor: RecipeDto | ExtractorDto | undefined): recipeOrExtractor is ExtractorDto => {
   return !isNil(recipeOrExtractor) && 'extractCycleTime' in recipeOrExtractor && 'itemsPerCycle' in recipeOrExtractor
 }
-export const isRecipe = (recipeOrExtractor: RecipeDto | ExtractorDto | null): recipeOrExtractor is RecipeDto => {
+export const isRecipe = (recipeOrExtractor: RecipeDto | ExtractorDto | undefined): recipeOrExtractor is RecipeDto => {
   return !isNil(recipeOrExtractor) && 'manufacturingDuration' in recipeOrExtractor
 }
 
@@ -64,6 +64,7 @@ export const isRecipe = (recipeOrExtractor: RecipeDto | ExtractorDto | null): re
 export class FactoryRequirementsComponent {
   requiredFactoryItems: Requirements[] = []
   @Input() graphSubject!: BehaviorSubject<GraphNavigator | null>
+  @Input() updateGraphSubject!: Subject<boolean>;
 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
@@ -76,15 +77,21 @@ export class FactoryRequirementsComponent {
       if (!isEmpty(this.requiredFactoryItems)) {
         return;
       }
-      const itemRequirements = params.getAll('factoryRequirement').map(e => JSON.parse(e))
+      const itemRequirements = params.getAll('factoryRequirement').map(e => JSON.parse(e) as QueryParamRequirement)
 
-      this.requiredFactoryItems = await Promise.all(itemRequirements.map(async e => {
+      this.requiredFactoryItems = await Promise.all(itemRequirements.map(async req => {
+        const item = await lastValueFrom(this.itemDescriptorService.findByClassName1(req.itemClass))
         let recipe: RecipeDto | null = null
+        let extractor: ExtractorDto | null = null
 
-        if (e.recipeClass) {
-          recipe = await lastValueFrom(this.recipeService.findByClassName(e.recipeClass))
+        if (req.recipeClass) {
+          recipe = await lastValueFrom(this.recipeService.findByClassName(req.recipeClass))
         }
-        return this.createFactoryItemRequirement(await lastValueFrom(this.itemDescriptorService.findByClassName1(e.itemClass)), recipe, e.requiredAmount)
+        if (req.extractorClass && item.extractedIn) {
+          extractor = Array.from(item.extractedIn).find(e => e.className === req.extractorClass) || null
+        }
+
+        return this.createFactoryItemRequirement(item, recipe || extractor, req.requiredAmount)
       }))
       await this.onRequirementChanged()
       this.updateQueryParams()
@@ -110,7 +117,7 @@ export class FactoryRequirementsComponent {
       return
     }
 
-    const newGraph = new GraphNavigator(sealed)
+    const newGraph = new GraphNavigator(sealed, this.updateGraphSubject)
     const graphRequest = sealed.map(e => this.makeFactorySiteRequest(e))
     const graphResponse = await lastValueFrom(this.factoryPlannerControllerService.planFactorySite(graphRequest))
 
@@ -165,11 +172,16 @@ export class FactoryRequirementsComponent {
   private getQueryParamRequirements(): QueryParamRequirement[] {
     const sealed = this.getSealedRequirements()
 
-    return sealed.map(({item, manufacturing, requiredAmount}) => ({
-      itemClass: item.className,
-      recipeClass: manufacturing?.className,
-      requiredAmount: requiredAmount
-    }))
+    return sealed.map(({item, manufacturing, requiredAmount}) => {
+      const recipeClass = isRecipe(manufacturing) ? manufacturing.className : undefined
+      const extractorClass = isExtractor(manufacturing) ? manufacturing.className : undefined
+      return ({
+        itemClass: item.className,
+        requiredAmount: requiredAmount,
+        recipeClass,
+        extractorClass
+      });
+    })
   }
 
   private makeFactorySiteRequest(requirement: SealedRequirement): FactorySiteRequest {
@@ -208,5 +220,13 @@ export class FactoryRequirementsComponent {
       itemClass: itemClass,
       extractorClass: extractorClass,
     }
+  }
+
+  onRequirementRemoved(idx: number) {
+    delete this.requiredFactoryItems[idx]
+    this.requiredFactoryItems = this.requiredFactoryItems.filter((_, index) => index !== idx);
+
+    this.updateQueryParams()
+    this.onRequirementChanged()
   }
 }

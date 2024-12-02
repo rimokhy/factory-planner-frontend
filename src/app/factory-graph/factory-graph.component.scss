@@ -1,0 +1,32 @@
+
+.graph-content-container img {
+  display: block;
+}
+
+.required-number {
+  position: absolute;
+  bottom: -5px;
+  color: white;
+  font-size: 16px;
+}
+.graph-preview {
+  display: grid;
+  height: 100vh;
+  overflow: hidden;
+}
+.graph-content-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.graph-image-container {
+  position: relative;
+  display: inline-block;
+}
+
+.graph-button-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}

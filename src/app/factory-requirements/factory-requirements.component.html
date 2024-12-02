@@ -1,8 +1,14 @@
 <mat-card>
   <mat-card-content>
     <mat-list>
-      @for (factoryRequirement of requiredFactoryItems; track factoryRequirement) {
+      @for (factoryRequirement of requiredFactoryItems; track factoryRequirement; let idx = $index) {
         <app-item-descriptor-picker [itemSelected]="factoryRequirement.item" [recipeSelected]="factoryRequirement.manufacturing" [amountSelected]="factoryRequirement.requiredAmount" ></app-item-descriptor-picker>
+
+        <div>
+          <button mat-icon-button	 aria-label="Remove requirement" (click)="onRequirementRemoved(idx)">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
       }
     </mat-list>
   </mat-card-content>
