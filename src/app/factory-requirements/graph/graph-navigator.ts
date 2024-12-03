@@ -21,9 +21,11 @@ export class GraphNavigator {
   nodes: GraphNode[] = [];
   edges: GraphEdge[] = [];
 
-  constructor(private readonly requirements: SealedRequirement[], private readonly updateGraphSubject: Subject<boolean>) {
+  constructor(private requirements: SealedRequirement[], private readonly updateGraphSubject: Subject<boolean>) {
 
   }
+
+
 
   populate({nodes, edges}: GraphFactoryNodeFactoryEdge) {
     nodes.forEach((node) => {
@@ -91,7 +93,11 @@ export class GraphNavigator {
     return this.getTotalItemProducedItems(node) - this.getTotalItemRequiredItems(node);
   }
 
-  actualizeGraph() {
+  actualizeGraph(requirements: SealedRequirement[] | undefined = undefined): void {
+    if (!isNil(requirements)) {
+      this.requirements = requirements
+    }
+
     this.edges.forEach(edge => {
       edge.totalOutputPerMinute = 0
     })

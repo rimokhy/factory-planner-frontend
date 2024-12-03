@@ -34,6 +34,7 @@ export class RecipePickerComponent implements OnInit {
     private readonly recipeService: RecipeControllerService
   ) {
     this.selectedRecipeClass.subscribe(recipeClass => {
+      console.log('display recipeClass', recipeClass)
       const recipe = this.recipes.value.find(e => e.className === recipeClass)
       const extractors = Array.from(this.itemSelected.value?.extractedIn || [])
       const extractor = extractors.find(e => e.className === recipeClass)
@@ -43,8 +44,6 @@ export class RecipePickerComponent implements OnInit {
         this.recipeSelected.next(recipe);
       } else if (extractor) {
         this.recipeSelected.next(extractor);
-      } else {
-        console.warn(`Supposed to emit recipe ${recipeClass}, but wasnt found in options`)
       }
     })
   }
@@ -53,11 +52,15 @@ export class RecipePickerComponent implements OnInit {
     this.itemSelected.subscribe(async item => {
       if (item?.className) {
         this.recipes.next(await lastValueFrom(this.recipeService.findAllByProducedItem(item?.className)))
+        this.recipeSelected.next(null)
       }
     })
     this.recipeSelected.subscribe(recipe => {
+      console.log('recipe selected', recipe);
       if (recipe) {
         this.selectedRecipeClass.set(recipe.className)
+      } else {
+        this.selectedRecipeClass.set(undefined)
       }
     })
   }

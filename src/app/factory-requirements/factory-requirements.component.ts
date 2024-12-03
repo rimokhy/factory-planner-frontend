@@ -112,11 +112,6 @@ export class FactoryRequirementsComponent {
 
   async onRequirementChanged() {
     const sealed = this.getSealedRequirements()
-
-    if (isEmpty(sealed)) {
-      return
-    }
-
     const newGraph = new GraphNavigator(sealed, this.updateGraphSubject)
     const graphRequest = sealed.map(e => this.makeFactorySiteRequest(e))
     const graphResponse = await lastValueFrom(this.factoryPlannerControllerService.planFactorySite(graphRequest))
@@ -129,6 +124,7 @@ export class FactoryRequirementsComponent {
   updateQueryParams() {
     const factoryRequirement = this.getQueryParamRequirements()
 
+    console.log('saving params', factoryRequirement)
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
       queryParams: {
@@ -151,14 +147,11 @@ export class FactoryRequirementsComponent {
       this.updateQueryParams()
     })
     newRecipe.subscribe(value => {
-      if (isNil(value)) {
-        return
-      }
       this.onRequirementChanged()
       this.updateQueryParams()
     })
     newAmount.subscribe(value => {
-      this.graphSubject.value?.actualizeGraph()
+      this.graphSubject.value?.actualizeGraph(this.getSealedRequirements())
       this.updateQueryParams()
     })
 

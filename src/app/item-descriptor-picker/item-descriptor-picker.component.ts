@@ -43,6 +43,7 @@ export class ItemDescriptorPickerComponent implements OnInit {
     this.amountSelected.subscribe(value => {
       if (!isNil(value)) {
         this.itemNumberFormControl.setValue(value);
+        this.recipeSelected.next(null)
       }
     })
 
