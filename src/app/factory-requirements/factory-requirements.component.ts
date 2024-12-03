@@ -124,7 +124,6 @@ export class FactoryRequirementsComponent {
   updateQueryParams() {
     const factoryRequirement = this.getQueryParamRequirements()
 
-    console.log('saving params', factoryRequirement)
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
       queryParams: {
