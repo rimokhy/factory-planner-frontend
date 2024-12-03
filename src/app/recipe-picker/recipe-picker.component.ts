@@ -25,6 +25,7 @@ import {AsyncPipe, NgIf} from "@angular/common";
 
 })
 export class RecipePickerComponent implements OnInit {
+  NO_OPTION_ITEM = {label: 'None', value: 'NO_OPTION_ITEM'};
   @Input() itemSelected!: BehaviorSubject<ItemDescriptorDto | null>;
   @Input() recipeSelected!: BehaviorSubject<RecipeDto | ExtractorDto | null>;
   selectedRecipeClass = model<string>()
@@ -39,7 +40,9 @@ export class RecipePickerComponent implements OnInit {
       const extractor = extractors.find(e => e.className === recipeClass)
 
 
-      if (recipe) {
+      if (recipeClass === this.NO_OPTION_ITEM.value) {
+        this.recipeSelected.next(null)
+      } else if (recipe) {
         this.recipeSelected.next(recipe);
       } else if (extractor) {
         this.recipeSelected.next(extractor);
@@ -51,7 +54,11 @@ export class RecipePickerComponent implements OnInit {
     this.itemSelected.subscribe(async item => {
       if (item?.className) {
         this.recipes.next(await lastValueFrom(this.recipeService.findAllByProducedItem(item?.className)))
+/*
+ TODO: Changing item doesnt deselect the recipe
+ When fixed, test reloading from requirements in path with recipe
         this.recipeSelected.next(null)
+*/
       }
     })
     this.recipeSelected.subscribe(recipe => {

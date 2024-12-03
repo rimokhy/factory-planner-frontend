@@ -13,7 +13,7 @@
       </div>
 
       <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-        @for (option of filteredOptions | async; track option) {
+        @for (option of filteredOptions | async; track option.className) {
           <mat-option [value]="option">{{ option.displayName }}</mat-option>
         }
       </mat-autocomplete>

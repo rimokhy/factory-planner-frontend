@@ -19,7 +19,7 @@ import {
 import {ItemDescriptorPickerComponent} from "../item-descriptor-picker/item-descriptor-picker.component";
 import {isEmpty, isNil} from "lodash";
 import {ActivatedRoute, Router} from "@angular/router";
-import {BehaviorSubject, lastValueFrom, Subject} from "rxjs";
+import {BehaviorSubject, lastValueFrom, Subject, take} from "rxjs";
 import {GraphNavigator} from "./graph/graph-navigator";
 import {SealedRequirement} from "./graph/node.factory";
 
@@ -73,25 +73,26 @@ export class FactoryRequirementsComponent {
     private readonly recipeService: RecipeControllerService,
     private readonly factoryPlannerControllerService: FactoryPlannerControllerService,
   ) {
-    this.activatedRoute.queryParamMap.subscribe(async params => {
+    this.activatedRoute.queryParamMap.pipe(take(1)).subscribe(async params => {
       if (!isEmpty(this.requiredFactoryItems)) {
         return;
       }
       const itemRequirements = params.getAll('factoryRequirement').map(e => JSON.parse(e) as QueryParamRequirement)
-
+      if (isEmpty(itemRequirements)) {
+        return;
+      }
       this.requiredFactoryItems = await Promise.all(itemRequirements.map(async req => {
         const item = await lastValueFrom(this.itemDescriptorService.findByClassName1(req.itemClass))
-        let recipe: RecipeDto | null = null
-        let extractor: ExtractorDto | null = null
+        let recipeOrExtractor: RecipeDto | ExtractorDto | null = null
 
         if (req.recipeClass) {
-          recipe = await lastValueFrom(this.recipeService.findByClassName(req.recipeClass))
+          recipeOrExtractor = await lastValueFrom(this.recipeService.findByClassName(req.recipeClass))
         }
         if (req.extractorClass && item.extractedIn) {
-          extractor = Array.from(item.extractedIn).find(e => e.className === req.extractorClass) || null
+          recipeOrExtractor = Array.from(item.extractedIn).find(e => e.className === req.extractorClass) || null
         }
 
-        return this.createFactoryItemRequirement(item, recipe || extractor, req.requiredAmount)
+        return this.createFactoryItemRequirement(item, recipeOrExtractor, req.requiredAmount)
       }))
       await this.onRequirementChanged()
       this.updateQueryParams()
@@ -150,6 +151,7 @@ export class FactoryRequirementsComponent {
       this.updateQueryParams()
     })
     newAmount.subscribe(value => {
+       // TODO Changing amount deselect the recipe
       this.graphSubject.value?.actualizeGraph(this.getSealedRequirements())
       this.updateQueryParams()
     })
