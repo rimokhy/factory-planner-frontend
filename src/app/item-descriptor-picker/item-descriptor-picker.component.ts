@@ -1,4 +1,4 @@
-import {Component, Input, model, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -10,7 +10,6 @@ import {MatDivider} from "@angular/material/divider";
 import {MatIcon} from "@angular/material/icon";
 import {isNil} from "lodash";
 import {RecipePickerComponent} from "../recipe-picker/recipe-picker.component";
-import {MatIconButton, MatMiniFabButton} from "@angular/material/button";
 
 @Component({
   selector: 'app-item-descriptor-picker',

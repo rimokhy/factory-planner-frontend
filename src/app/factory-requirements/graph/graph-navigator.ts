@@ -133,6 +133,7 @@ export class GraphNavigator {
             const itemProduced = produced - requirements
 
             if (itemProduced < 0 && recipe.requiredMachines === 0) {
+              console.log('Recalculation', item.id)
               this.computeRecipe(recipe, item, requirements, recipeEdge)
             }
           } else if (recipe instanceof ExtractingSiteNodeImpl) {
@@ -161,12 +162,19 @@ export class GraphNavigator {
 
   private computeRecipe(recipe: CraftingSiteNodeImpl, productItem: ItemSiteNodeImpl, requiredTotal: number, recipeToItemEdge: FactoryEdge, callstack: {
     recipe: string,
+    item: string,
     requiredTotal: number,
   }[] = []) {
+    if (callstack.filter(e => e.item === productItem.id && e.recipe === recipe.id).length > 100) {
+      console.warn('Could not calculate looping recipe', recipe.id, productItem.id)
+      throw new Error('Could not calculate looping recipe')
+    }
     if (callstack.some(e => e.recipe === recipe.id && this.isEqualsFixed(requiredTotal, e.requiredTotal))) {
+      console.warn('Balanced recipe to find convergence', recipe.id, productItem.id)
       return
     }
-    callstack.push({recipe: recipe.id, requiredTotal: requiredTotal})
+
+    callstack.push({recipe: recipe.id, item: productItem.id, requiredTotal: requiredTotal})
 
     const requiredTotalPerCycle = this.minuteToCycle(recipe, requiredTotal)
     const requiredCycle = this.computeRecipeRequiredMachines(recipe, productItem, requiredTotalPerCycle)
@@ -183,6 +191,7 @@ export class GraphNavigator {
       if (ingredient && ingredient instanceof ItemSiteNodeImpl) {
         const ingredientTotal = this.cycleToMinute(recipe, newTotalOutputPerCycle) + this.getRequiredTotal(ingredient.factorySiteTarget.className)
 
+        // TODO recycled based recipe
         this.computeItemRequirement(ingredient, ingredientTotal, callstack, recipe)
       }
     }
@@ -198,7 +207,8 @@ export class GraphNavigator {
 
   private computeItemRequirement(item: ItemSiteNodeImpl, requiredTotalPerMinute: number, callstack: {
     recipe: string,
-    requiredTotal: number
+    item: string,
+    requiredTotal: number,
   }[] = [], parent: CraftingSiteNodeImpl | undefined = undefined) {
     const recipes = this.getIncomingEdges(item)
 
@@ -207,6 +217,7 @@ export class GraphNavigator {
       const recipe = this.nodes.find(recipeNode => recipeNode.id === recipeEdge.source)
 
       if (recipe instanceof CraftingSiteNodeImpl) {
+        console.log('Wanna craft', item.id, 'with recipe', recipe.id, 'with total', requiredTotalPerMinute, 'for', parent?.id)
         this.computeRecipe(recipe, item, requiredTotalPerMinute, recipeEdge, callstack)
       }
     })

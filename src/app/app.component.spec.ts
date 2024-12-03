@@ -1,9 +1,19 @@
-import { TestBed } from '@angular/core/testing';
-import { AppComponent } from './app.component';
+import {TestBed} from '@angular/core/testing';
+import {AppComponent} from './app.component';
+import {RouterOutlet} from "@angular/router";
+import {RecipePickerComponent} from "./recipe-picker/recipe-picker.component";
+import {ItemDescriptorPickerComponent} from "./item-descriptor-picker/item-descriptor-picker.component";
+import {NgIf} from "@angular/common";
+import {NavComponent} from "./nav/nav.component";
+import {appConfig} from "./app.config";
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      providers: [
+        // TODO should mock
+        ...appConfig.providers
+      ],
       imports: [AppComponent],
     }).compileComponents();
   });
@@ -12,18 +22,5 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
-  });
-
-  it(`should have the 'factory-planner' title`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('factory-planner');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, factory-planner');
   });
 });

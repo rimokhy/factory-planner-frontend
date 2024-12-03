@@ -3,7 +3,9 @@
     <mat-tab-group>
       <mat-tab label="Graph view">
 
-        <app-factory-graph [graphSubject]="graphSubject" [requirements]="requirements" [updateGraphSubject]="updateGraphSubject"></app-factory-graph>
+        @if (graphSubject | async; as graph) {
+          <app-factory-graph [graphSubject]="graphSubject" [requirements]="requirements" [updateGraphSubject]="updateGraphSubject"></app-factory-graph>
+        }
 
       </mat-tab>
       <mat-tab label="List view"> Content 2</mat-tab>

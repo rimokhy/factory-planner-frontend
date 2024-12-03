@@ -57,7 +57,6 @@ export class FactoryGraphComponent implements OnInit {
       return
     }
     if (isItemSiteNode(nodeClicked) && this.requirements.getSealedRequirements().every(e => e.item.className !== nodeClicked.factorySiteTarget.className)) {
-      console.log('Clicked',nodeClicked.factorySiteTarget)
       this.requirements.addFactoryRequirement(nodeClicked.factorySiteTarget)
       this.requirements.onRequirementChanged()
       this.requirements.updateQueryParams()
