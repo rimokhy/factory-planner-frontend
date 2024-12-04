@@ -22,6 +22,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {BehaviorSubject, lastValueFrom, Subject, take} from "rxjs";
 import {GraphNavigator} from "./graph/graph-navigator";
 import {SealedRequirement} from "./graph/node.factory";
+import {makeFactorySiteRequest} from "./item-site.request";
 
 
 export interface QueryParamRequirement {
@@ -114,7 +115,7 @@ export class FactoryRequirementsComponent {
   async onRequirementChanged() {
     const sealed = this.getSealedRequirements()
     const newGraph = new GraphNavigator(sealed, this.updateGraphSubject)
-    const graphRequest = sealed.map(e => this.makeFactorySiteRequest(e))
+    const graphRequest = sealed.map(e => makeFactorySiteRequest(e))
     const graphResponse = await lastValueFrom(this.factoryPlannerControllerService.planFactorySite(graphRequest))
 
     newGraph.populate(graphResponse)
@@ -178,43 +179,7 @@ export class FactoryRequirementsComponent {
     })
   }
 
-  private makeFactorySiteRequest(requirement: SealedRequirement): FactorySiteRequest {
-    if (isNil(requirement.manufacturing)) {
-      return this.makeItemSiteRequest(requirement.item.className);
-    }
-    if (isRecipe(requirement.manufacturing)) {
-      return this.makeCraftingSiteRequest(requirement.item.className, requirement.manufacturing.className);
-    }
-    if (isExtractor(requirement.manufacturing)) {
-      return this.makeExtractingSiteRequest(requirement.item.className, requirement.manufacturing.className)
-    }
 
-    console.error('Unhandled req', requirement);
-    throw new Error('Unhandled req');
-  }
-
-  private makeItemSiteRequest(itemClass: string): ItemSiteRequest {
-    return {
-      type: FactorySiteRequest.TypeEnum.ItemSite,
-      itemClass: itemClass,
-    }
-  }
-
-  private makeCraftingSiteRequest(itemClass: string, recipeClass: string): CraftingSiteRequest {
-    return {
-      type: FactorySiteRequest.TypeEnum.CraftingSite,
-      itemClass: itemClass,
-      recipeClass: recipeClass,
-    }
-  }
-
-  private makeExtractingSiteRequest(itemClass: string, extractorClass: string): ExtractingSiteRequest {
-    return {
-      type: FactorySiteRequest.TypeEnum.ExtractorSite,
-      itemClass: itemClass,
-      extractorClass: extractorClass,
-    }
-  }
 
   onRequirementRemoved(idx: number) {
     delete this.requiredFactoryItems[idx]

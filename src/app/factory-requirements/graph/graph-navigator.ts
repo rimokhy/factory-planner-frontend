@@ -122,8 +122,7 @@ export class GraphNavigator {
         const requirements = this.getTotalItemRequiredItems(item) + this.getRequiredTotal(item.factorySiteTarget.className)
         const produced = this.getTotalItemProducedItems(item)
         const total = produced - requirements
-        const outgoing = this.getOutgoingEdge(item)
-        const incoming = this.getIncomingEdges(item).filter(producer => !outgoing.some(e => e.source === producer.target))
+        const incoming = this.getIncomingEdges(item)
 
         if (total < 0) {
           console.log('Recalculation', item.id, 'with produced', produced, ' and req ', requirements)
@@ -156,6 +155,7 @@ export class GraphNavigator {
         })
       })
 
+    console.log(this.edges)
 
     this.updateGraphSubject.next(true)
   }
@@ -226,15 +226,6 @@ export class GraphNavigator {
         this.computeRecipe(recipe, item, requiredTotalPerMinute, callstack)
       }
     })
-  }
-
-  private isRequirement(node: GraphNode | string): boolean {
-    if (!this.requirements) {
-      return true
-    }
-    const nodeId = (typeof node === 'string') ? node : node.id
-
-    return this.requirements.some(requirement => requirement.item?.className === nodeId)
   }
 
   private cycleToMinute(site: CraftingSiteNode, amount: number): number {
