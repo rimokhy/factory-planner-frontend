@@ -1,5 +1,6 @@
 import {SealedRequirement} from "../node.factory";
 
+// http://192.168.1.61:4200/factory-planning?factoryRequirement=%7B%22itemClass%22:%22Desc_IronPlate_C%22,%22requiredAmount%22:300,%22recipeClass%22:%22Recipe_IronPlate_C%22%7D&factoryRequirement=%7B%22itemClass%22:%22Desc_IronRod_C%22,%22requiredAmount%22:300,%22recipeClass%22:%22Recipe_IronRod_C%22%7D&factoryRequirement=%7B%22itemClass%22:%22Desc_IronIngot_C%22,%22requiredAmount%22:0,%22recipeClass%22:%22Recipe_IngotIron_C%22%7D
 export const ROD_300_AND_300_PLATE = {
   name: 'ROD_300_AND_300_PLATE',
   requirements: [

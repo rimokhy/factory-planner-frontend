@@ -17,7 +17,7 @@ import {
   RecipeDto
 } from "../factory-planner-api";
 import {ItemDescriptorPickerComponent} from "../item-descriptor-picker/item-descriptor-picker.component";
-import {isEmpty, isNil} from "lodash";
+import {isEmpty, isEqual, isNil} from "lodash";
 import {ActivatedRoute, Router} from "@angular/router";
 import {BehaviorSubject, lastValueFrom, Subject, take} from "rxjs";
 import {GraphNavigator} from "./graph/graph-navigator";
@@ -66,6 +66,7 @@ export class FactoryRequirementsComponent {
   requiredFactoryItems: Requirements[] = []
   @Input() graphSubject!: BehaviorSubject<GraphNavigator | null>
   @Input() updateGraphSubject!: Subject<boolean>;
+  private graphCreating = false
 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
@@ -95,13 +96,16 @@ export class FactoryRequirementsComponent {
 
         return this.createFactoryItemRequirement(item, recipeOrExtractor, req.requiredAmount)
       }))
+      this.requiredFactoryItems.forEach(e => {
+        this.bindSubscriptions(e)
+      })
       await this.onRequirementChanged()
       this.updateQueryParams()
     })
   }
 
   addFactoryRequirement(item: ItemDescriptorDto | null = null, recipe: RecipeDto | ExtractorDto | null = null, amount: number = 0) {
-    return this.requiredFactoryItems.push(this.createFactoryItemRequirement(item, recipe, amount))
+    return this.requiredFactoryItems.push(this.bindSubscriptions(this.createFactoryItemRequirement(item, recipe, amount)))
   }
 
   getSealedRequirements(): SealedRequirement[] {
@@ -114,13 +118,19 @@ export class FactoryRequirementsComponent {
 
   async onRequirementChanged() {
     const sealed = this.getSealedRequirements()
-    const newGraph = new GraphNavigator(sealed, this.updateGraphSubject)
-    const graphRequest = sealed.map(e => makeFactorySiteRequest(e))
-    const graphResponse = await lastValueFrom(this.factoryPlannerControllerService.planFactorySite(graphRequest))
+    const existing = this.graphSubject.value?.requirements
 
-    newGraph.populate(graphResponse)
+    if (!this.graphCreating && !isEqual(sealed, existing)) {
+      this.graphCreating = true
+      const newGraph = new GraphNavigator(sealed, this.updateGraphSubject)
+      const graphRequest = sealed.map(e => makeFactorySiteRequest(e))
+      const graphResponse = await lastValueFrom(this.factoryPlannerControllerService.planFactorySite(graphRequest))
 
-    this.graphSubject.next(newGraph)
+      newGraph.populate(graphResponse)
+
+      this.graphSubject.next(newGraph)
+      this.graphCreating = false
+    }
   }
 
   updateQueryParams() {
@@ -140,28 +150,34 @@ export class FactoryRequirementsComponent {
     const newRecipe = new BehaviorSubject<RecipeDto | ExtractorDto | null>(recipe)
     const newAmount = new BehaviorSubject<number>(amount)
 
-    newItem.subscribe(value => {
+    return {
+      item: newItem,
+      manufacturing: newRecipe,
+      requiredAmount: newAmount
+    }
+  }
+
+  private bindSubscriptions(req: Requirements): Requirements {
+    const {item, requiredAmount,manufacturing} = req
+
+    item.subscribe(value => {
       if (isNil(value)) {
         return
       }
       this.onRequirementChanged()
       this.updateQueryParams()
     })
-    newRecipe.subscribe(value => {
+    manufacturing.subscribe(value => {
       this.onRequirementChanged()
       this.updateQueryParams()
     })
-    newAmount.subscribe(value => {
-       // TODO Changing amount deselect the recipe
+    requiredAmount.subscribe(value => {
+      // TODO Changing amount deselect the recipe
       this.graphSubject.value?.actualizeGraph(this.getSealedRequirements())
       this.updateQueryParams()
     })
 
-    return {
-      item: newItem,
-      manufacturing: newRecipe,
-      requiredAmount: newAmount
-    }
+    return req
   }
 
   private getQueryParamRequirements(): QueryParamRequirement[] {
