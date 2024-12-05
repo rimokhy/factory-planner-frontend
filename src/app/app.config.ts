@@ -10,7 +10,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideAnimationsAsync('noop'),
+    provideAnimationsAsync(),
     provideHttpClient(),
     { provide: BASE_PATH, useValue: 'http://192.168.1.61:8080' }
   ]

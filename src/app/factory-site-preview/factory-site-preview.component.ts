@@ -5,6 +5,7 @@ import {GraphNavigator} from "../factory-requirements/graph/graph-navigator";
 import {FactoryGraphComponent} from "../factory-graph/factory-graph.component";
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {AsyncPipe, NgIf} from "@angular/common";
+import {MatGridListModule} from "@angular/material/grid-list";
 
 
 @Component({
@@ -17,6 +18,7 @@ import {AsyncPipe, NgIf} from "@angular/common";
     MatTab,
     NgIf,
     AsyncPipe,
+    MatGridListModule
   ],
   templateUrl: './factory-site-preview.component.html',
   styleUrl: './factory-site-preview.component.scss'

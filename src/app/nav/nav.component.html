@@ -7,7 +7,7 @@
 
   <mat-sidenav-container class="sidenav-container"
                          [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
-    <mat-sidenav #snav [mode]="mobileQuery.matches ? 'over' : 'side'"
+    <mat-sidenav #snav [mode]="'over'"
                  [fixedInViewport]="mobileQuery.matches" fixedTopGap="56">
       <mat-divider></mat-divider>
       <mat-nav-list>
@@ -21,4 +21,6 @@
       <ng-content class="content-wrapper-horizontal"></ng-content>
     </mat-sidenav-content>
   </mat-sidenav-container>
+
+
 </div>
