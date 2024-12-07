@@ -12,7 +12,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimationsAsync(),
     provideHttpClient(),
-    { provide: BASE_PATH, useValue: 'http://192.168.1.61:8080' }
+    { provide: BASE_PATH, useValue: 'http://51.178.82.124:8080' }
   ]
 };
 
