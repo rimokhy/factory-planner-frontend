@@ -1,5 +1,5 @@
-<div class="factory-selection-content ">
-  <div class="factory-preview-content">
+<mat-grid-list cols="2">
+  <mat-grid-tile colspan="1"  rowspan="1">
     <mat-tab-group>
       <mat-tab label="Graph view">
 
@@ -10,10 +10,8 @@
       </mat-tab>
       <mat-tab label="List view"> Content 2</mat-tab>
     </mat-tab-group>
-  </div>
-
-  <div class="factory-requirements-content">
+  </mat-grid-tile>
+  <mat-grid-tile colspan="2" rowspan="1">
     <app-factory-requirements [graphSubject]="graphSubject" [updateGraphSubject]="updateGraphSubject"></app-factory-requirements>
-  </div>
-</div>
-
+  </mat-grid-tile>
+</mat-grid-list>
