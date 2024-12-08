@@ -27,7 +27,10 @@ export class FactorySitePreviewComponent implements AfterContentInit {
   updateGraphSubject!: Subject<boolean>;
   graphSubject!: BehaviorSubject<GraphNavigator | null>
   @ViewChild(FactoryRequirementsComponent) requirements!: FactoryRequirementsComponent;
+  tiles= [
+    {text: 'Two', cols: 1, rows: 2, color: 'lightgreen'},
 
+  ];
   ngAfterContentInit(): void {
     this.graphSubject = new BehaviorSubject<GraphNavigator | null>(null)
     this.updateGraphSubject = new Subject()

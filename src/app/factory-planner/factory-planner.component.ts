@@ -29,4 +29,5 @@ import {MatCard, MatCardContent} from "@angular/material/card";
   styleUrl: './factory-planner.component.scss'
 })
 export class FactoryPlannerComponent {
+
 }
