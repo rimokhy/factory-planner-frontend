@@ -31,6 +31,16 @@ html {
   min-height: 100%;
 }
 
+.flexbox-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flexbox-row {
+  display: flex;
+  flex-direction: row;
+}
+
 
 @include mat.core();
 @include mat.color-variants-backwards-compatibility($theme);
@@ -40,17 +50,19 @@ html {
   justify-content: flex-start !important ;
   align-items: flex-start !important;
 }
+/*
 
-/* hide scrollbar but allow scrolling */
+!* hide scrollbar but allow scrolling *!
 element {
-  -ms-overflow-style: none; /* for Internet Explorer, Edge */
-  scrollbar-width: none; /* for Firefox */
+  -ms-overflow-style: none; !* for Internet Explorer, Edge *!
+  scrollbar-width: none; !* for Firefox *!
   overflow-y: scroll;
 }
 element::-webkit-scrollbar {
-  display: none; /* for Chrome, Safari, and Opera */
+  display: none; !* for Chrome, Safari, and Opera *!
 }
 ::-webkit-scrollbar {
   width: 0px;
-  background: transparent; /* make scrollbar transparent */
+  background: transparent; !* make scrollbar transparent *!
 }
+*/

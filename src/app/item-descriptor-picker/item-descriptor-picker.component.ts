@@ -1,8 +1,8 @@
-import {Component, Input, model, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {ExtractorDto, ItemDescriptorControllerService, ItemDescriptorDto, RecipeDto} from "../factory-planner-api";
+import {ItemDescriptorControllerService, ItemDescriptorDto} from "../factory-planner-api";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {AsyncPipe, NgIf, NgOptimizedImage} from "@angular/common";
 import {BehaviorSubject, lastValueFrom, Observable, startWith, switchMap} from "rxjs";
@@ -10,22 +10,20 @@ import {MatDivider} from "@angular/material/divider";
 import {MatIcon} from "@angular/material/icon";
 import {isNil} from "lodash";
 import {RecipePickerComponent} from "../recipe-picker/recipe-picker.component";
-import {MatIconButton, MatMiniFabButton} from "@angular/material/button";
+import {MatIconButton} from "@angular/material/button";
 
 @Component({
   selector: 'app-item-descriptor-picker',
   standalone: true,
-  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, ReactiveFormsModule, AsyncPipe, MatDivider, NgIf, NgOptimizedImage, MatIcon, RecipePickerComponent],
+  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, ReactiveFormsModule, AsyncPipe, MatDivider, NgIf, NgOptimizedImage, MatIcon, RecipePickerComponent, MatIconButton],
   templateUrl: './item-descriptor-picker.component.html',
   styleUrl: './item-descriptor-picker.component.scss'
 })
 export class ItemDescriptorPickerComponent implements OnInit {
   itemDescriptorFormControl = new FormControl<string | ItemDescriptorDto>('');
   filteredOptions!: Observable<ItemDescriptorDto[]>;
-  itemNumberFormControl = new FormControl<number | null>(null);
   @Input() itemSelected!: BehaviorSubject<ItemDescriptorDto | null>;
-  @Input() recipeSelected!: BehaviorSubject<RecipeDto | ExtractorDto | null>;
-  @Input() amountSelected!: BehaviorSubject<number>;
+  @Output() onClear = new EventEmitter<never>();
 
   constructor(
     private readonly itemDescriptorService: ItemDescriptorControllerService,
@@ -33,18 +31,12 @@ export class ItemDescriptorPickerComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.itemNumberFormControl.setValue(0)
     this.itemSelected.subscribe(value => {
       if (!isNil(value)) {
         this.itemDescriptorFormControl.setValue(value);
       }
     })
 
-    this.amountSelected.subscribe(value => {
-      if (!isNil(value)) {
-        this.itemNumberFormControl.setValue(value);
-      }
-    })
 
     this.filteredOptions = this.itemDescriptorFormControl.valueChanges.pipe(startWith(''), switchMap(async value => {
       if (typeof value === 'string' && value !== '') {
@@ -56,19 +48,10 @@ export class ItemDescriptorPickerComponent implements OnInit {
       }
       if (value !== null && typeof value === 'object' && value !== this.itemSelected.value) {
         this.itemSelected.next(value)
-        this.itemNumberFormControl.setValue(1)
       }
 
       return []
     }));
-
-
-    this.itemNumberFormControl.valueChanges.subscribe(value => {
-      if (!isNil(value) && value !== this.amountSelected.value) {
-        this.amountSelected.next(value)
-      }
-    })
-
   }
 
   displayFn(item: ItemDescriptorDto): string {

@@ -1,36 +1,21 @@
-<form class="item-descriptor-picker-container">
-  <div *ngIf="itemSelected | async as item">
-    <img class="png-icon"  src="{{item.icon.link}}"
+<mat-form-field style="width: 100%;">
+  <mat-label>Item</mat-label>
+
+  <div style="display: flex; align-items: center; gap: 16px; max-height: 32px">
+    <img *ngIf="itemSelected | async as item" class="png-icon" style="max-height: 32px" src="{{item.icon.link}}"
          alt="${{item.icon.objectPath}}">
+    <input type="text" matInput [formControl]="itemDescriptorFormControl" [matAutocomplete]="auto">
+    <button mat-icon-button aria-label="Remove requirement" (click)="onClear.emit()">
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
-  <div>
-    <mat-form-field>
-      <mat-label>Item</mat-label>
+  <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
 
-      <div style="display: flex; align-items: center; gap: 16px;">
+    @for (option of filteredOptions | async; track option.className) {
+      <mat-option [value]="option">{{ option.displayName }}</mat-option>
+    }
+  </mat-autocomplete>
 
-        <input type="text" matInput [formControl]="itemDescriptorFormControl" [matAutocomplete]="auto">
-      </div>
-
-      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-        @for (option of filteredOptions | async; track option.className) {
-          <mat-option [value]="option">{{ option.displayName }}</mat-option>
-        }
-      </mat-autocomplete>
-
-    </mat-form-field>
-    <app-recipe-picker [itemSelected]="itemSelected" [recipeSelected]="recipeSelected"></app-recipe-picker>
-
-  </div>
-
-  <div class="required-amount-input-container">
-    <mat-form-field class="number-input">
-      <mat-label>Amount / min</mat-label>
-      <input type="number" matInput [formControl]="itemNumberFormControl">
-    </mat-form-field>
-  </div>
-
-
-</form>
+</mat-form-field>
 
 

@@ -2,8 +2,8 @@ import {Component, Input} from '@angular/core';
 import {MatIcon} from "@angular/material/icon";
 import {MatDivider} from "@angular/material/divider";
 import {MatCard, MatCardContent, MatCardFooter} from "@angular/material/card";
-import {MatList, MatListItem} from "@angular/material/list";
-import {MatIconButton} from "@angular/material/button";
+import {MatList, MatListItem, MatListModule} from "@angular/material/list";
+import {MatButton, MatButtonModule, MatIconButton} from "@angular/material/button";
 import {
   CraftingSiteRequest,
   ExtractingSiteRequest,
@@ -23,6 +23,8 @@ import {BehaviorSubject, lastValueFrom, Subject, take} from "rxjs";
 import {GraphNavigator} from "./graph/graph-navigator";
 import {SealedRequirement} from "./graph/node.factory";
 import {makeFactorySiteRequest} from "./item-site.request";
+import {AmountPickerComponent} from "../amount-picker/amount-picker.component";
+import {RecipePickerComponent} from "../recipe-picker/recipe-picker.component";
 
 
 export interface QueryParamRequirement {
@@ -38,7 +40,7 @@ interface Requirements {
   requiredAmount: BehaviorSubject<number>;
 }
 
-export const isExtractor = (recipeOrExtractor: RecipeDto | ExtractorDto | undefined): recipeOrExtractor is ExtractorDto => {
+export const isExtractor = (recipeOrExtractor: RecipeDto | ExtractorDto | undefined | null): recipeOrExtractor is ExtractorDto => {
   return !isNil(recipeOrExtractor) && 'extractCycleTime' in recipeOrExtractor && 'itemsPerCycle' in recipeOrExtractor
 }
 export const isRecipe = (recipeOrExtractor: RecipeDto | ExtractorDto | undefined): recipeOrExtractor is RecipeDto => {
@@ -50,14 +52,11 @@ export const isRecipe = (recipeOrExtractor: RecipeDto | ExtractorDto | undefined
   standalone: true,
   imports: [
     MatIcon,
-    MatDivider,
-    MatCardContent,
-    MatCard,
-    MatCardFooter,
-    MatList,
-    MatListItem,
-    MatIconButton,
-    ItemDescriptorPickerComponent
+    MatListModule,
+    MatButtonModule,
+    ItemDescriptorPickerComponent,
+    AmountPickerComponent,
+    RecipePickerComponent,
   ],
   templateUrl: './factory-requirements.component.html',
   styleUrl: './factory-requirements.component.scss'
