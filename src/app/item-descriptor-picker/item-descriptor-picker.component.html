@@ -1,8 +1,8 @@
 <mat-form-field style="width: 100%;">
-  <mat-label>Item</mat-label>
+  <mat-label>{{ title }}</mat-label>
 
-  <div style="display: flex; align-items: center; gap: 16px; max-height: 32px">
-    <img *ngIf="itemSelected | async as item" class="png-icon" style="max-height: 32px" src="{{item.icon.link}}"
+  <div style="display: flex; align-items: center;">
+    <img *ngIf="itemSelected | async as item" class="png-icon" style="height: 26px; margin-right: 16px" src="{{item.icon.link}}"
          alt="${{item.icon.objectPath}}">
     <input type="text" matInput [formControl]="itemDescriptorFormControl" [matAutocomplete]="auto">
     <button mat-icon-button aria-label="Remove requirement" (click)="onClear.emit()">

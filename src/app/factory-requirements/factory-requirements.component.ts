@@ -1,18 +1,12 @@
 import {Component, Input} from '@angular/core';
 import {MatIcon} from "@angular/material/icon";
-import {MatDivider} from "@angular/material/divider";
-import {MatCard, MatCardContent, MatCardFooter} from "@angular/material/card";
-import {MatList, MatListItem, MatListModule} from "@angular/material/list";
-import {MatButton, MatButtonModule, MatIconButton} from "@angular/material/button";
+import {MatListModule} from "@angular/material/list";
+import {MatButtonModule} from "@angular/material/button";
 import {
-  CraftingSiteRequest,
-  ExtractingSiteRequest,
   ExtractorDto,
   FactoryPlannerControllerService,
-  FactorySiteRequest,
   ItemDescriptorControllerService,
   ItemDescriptorDto,
-  ItemSiteRequest,
   RecipeControllerService,
   RecipeDto
 } from "../factory-planner-api";
@@ -34,10 +28,20 @@ export interface QueryParamRequirement {
   requiredAmount: number;
 }
 
-interface Requirements {
+interface Requirement {
   item: BehaviorSubject<ItemDescriptorDto | null>;
   manufacturing: BehaviorSubject<RecipeDto | ExtractorDto | null>;
   requiredAmount: BehaviorSubject<number>;
+}
+
+export interface SuppliedItem {
+  item: BehaviorSubject<ItemDescriptorDto | null>,
+  providedAmount: BehaviorSubject<number>;
+}
+
+export interface SealedSuppliedItem {
+  ite: ItemDescriptorDto;
+  providedAmount: number;
 }
 
 export const isExtractor = (recipeOrExtractor: RecipeDto | ExtractorDto | undefined | null): recipeOrExtractor is ExtractorDto => {
@@ -62,7 +66,8 @@ export const isRecipe = (recipeOrExtractor: RecipeDto | ExtractorDto | undefined
   styleUrl: './factory-requirements.component.scss'
 })
 export class FactoryRequirementsComponent {
-  requiredFactoryItems: Requirements[] = []
+  requiredFactoryItems: Requirement[] = []
+  suppliedItems: SuppliedItem[] = []
   @Input() graphSubject!: BehaviorSubject<GraphNavigator | null>
   @Input() updateGraphSubject!: Subject<boolean>;
   private graphCreating = false
@@ -107,6 +112,10 @@ export class FactoryRequirementsComponent {
     return this.requiredFactoryItems.push(this.bindSubscriptions(this.createFactoryItemRequirement(item, recipe, amount)))
   }
 
+  addSupplitedItem(item: ItemDescriptorDto | null = null) {
+    return this.suppliedItems.push(this.createSupplitedItem(item))
+  }
+
   getSealedRequirements(): SealedRequirement[] {
     return this.requiredFactoryItems.filter(e => !isNil(e.item.value)).map(e => ({
       item: e.item.value!!,
@@ -144,7 +153,19 @@ export class FactoryRequirementsComponent {
     });
   }
 
-  private createFactoryItemRequirement(item: ItemDescriptorDto | null, recipe: RecipeDto | ExtractorDto | null, amount: number = 0): Requirements {
+  onRequirementRemoved(idx: number) {
+    this.requiredFactoryItems = this.requiredFactoryItems.filter((_, index) => index !== idx);
+
+    this.updateQueryParams()
+    this.onRequirementChanged()
+  }
+
+  onSuppliedItemRemoved(idx: number) {
+    this.suppliedItems = this.suppliedItems.filter((_, index) => index !== idx);
+    this.graphSubject.value?.actualizeGraph(this.getSealedRequirements())
+  }
+
+  private createFactoryItemRequirement(item: ItemDescriptorDto | null, recipe: RecipeDto | ExtractorDto | null, amount: number = 0): Requirement {
     const newItem = new BehaviorSubject<ItemDescriptorDto | null>(item)
     const newRecipe = new BehaviorSubject<RecipeDto | ExtractorDto | null>(recipe)
     const newAmount = new BehaviorSubject<number>(amount)
@@ -156,8 +177,19 @@ export class FactoryRequirementsComponent {
     }
   }
 
-  private bindSubscriptions(req: Requirements): Requirements {
-    const {item, requiredAmount,manufacturing} = req
+  private createSupplitedItem(item: ItemDescriptorDto | null, amount: number = 0): SuppliedItem {
+    const newItem = new BehaviorSubject<ItemDescriptorDto | null>(item)
+
+    const newAmount = new BehaviorSubject<number>(amount)
+
+    return {
+      item: newItem,
+      providedAmount: newAmount
+    }
+  }
+
+  private bindSubscriptions(req: Requirement): Requirement {
+    const {item, requiredAmount, manufacturing} = req
 
     item.subscribe(value => {
       if (isNil(value)) {
@@ -192,15 +224,5 @@ export class FactoryRequirementsComponent {
         extractorClass
       });
     })
-  }
-
-
-
-  onRequirementRemoved(idx: number) {
-    delete this.requiredFactoryItems[idx]
-    this.requiredFactoryItems = this.requiredFactoryItems.filter((_, index) => index !== idx);
-
-    this.updateQueryParams()
-    this.onRequirementChanged()
   }
 }

@@ -1,28 +1,61 @@
 <div>
-  <button  mat-button aria-label="Add factory requirement" (click)="addFactoryRequirement()">
-    Add a requirement to your factory
-  </button>
-  <mat-divider style="margin-bottom: 16px;margin-top: 4px"></mat-divider>
+  <div class="flexbox-row" style="justify-content: space-between">
+    <button mat-stroked-button aria-label="Add factory requirement" (click)="addFactoryRequirement()">
+      <mat-icon>add</mat-icon>
+      Add a requirement
+    </button>
 
+    <div style="margin: 4px"></div>
 
-    @for (factoryRequirement of requiredFactoryItems; track factoryRequirement; let idx = $index) {
-        <div  class="flexbox-column">
-          <div class="flexbox-row" style="justify-content: space-between">
-            <app-item-descriptor-picker [style.width]="'100%'"
-              [itemSelected]="factoryRequirement.item" (onClear)="onRequirementRemoved(idx)"></app-item-descriptor-picker>
-          </div>
-          <div class="flexbox-row" style="justify-content: space-between">
-            <app-recipe-picker [itemSelected]="factoryRequirement.item"
-                               [recipeSelected]="factoryRequirement.manufacturing">
-            </app-recipe-picker>
-            <app-amount-picker [amountSelected]="factoryRequirement.requiredAmount"></app-amount-picker>
-          </div>
+    <button mat-stroked-button aria-label="Supply item" (click)="addSupplitedItem()">
+      <mat-icon>add</mat-icon>
 
+      Supply an item
+    </button>
+  </div>
+
+  <div style="margin: 8px"></div>
+
+  @for (supply of suppliedItems; track supply; let idx = $index) {
+    <div class="flexbox-column">
+      <div class="flexbox-row" style="justify-content: space-between">
+        <div style="width: 70%;">
+          <app-item-descriptor-picker
+            [title]="'Provided item'"
+            [itemSelected]="supply.item"
+            (onClear)="onSuppliedItemRemoved(idx)"></app-item-descriptor-picker>
 
         </div>
+        <app-amount-picker [amountSelected]="supply.providedAmount"></app-amount-picker>
+
+      </div>
 
 
-    }
+    </div>
+  }
+
+
+  @for (factoryRequirement of requiredFactoryItems; track factoryRequirement; let idx = $index) {
+    <div class="flexbox-column">
+      <div class="flexbox-row" style="justify-content: space-between;">
+        <app-item-descriptor-picker [style.width]="'100%'"
+                                    [title]="'Required item'"
+
+                                    [itemSelected]="factoryRequirement.item"
+                                    (onClear)="onRequirementRemoved(idx)"></app-item-descriptor-picker>
+      </div>
+      <div class="flexbox-row" style="justify-content: space-between">
+        <app-recipe-picker [itemSelected]="factoryRequirement.item"
+                           [recipeSelected]="factoryRequirement.manufacturing">
+        </app-recipe-picker>
+        <app-amount-picker [amountSelected]="factoryRequirement.requiredAmount"></app-amount-picker>
+      </div>
+
+
+    </div>
+  }
+
+
 
 
 </div>

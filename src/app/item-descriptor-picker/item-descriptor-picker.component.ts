@@ -24,6 +24,7 @@ export class ItemDescriptorPickerComponent implements OnInit {
   filteredOptions!: Observable<ItemDescriptorDto[]>;
   @Input() itemSelected!: BehaviorSubject<ItemDescriptorDto | null>;
   @Output() onClear = new EventEmitter<never>();
+  @Input() title!: string;
 
   constructor(
     private readonly itemDescriptorService: ItemDescriptorControllerService,
