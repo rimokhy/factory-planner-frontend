@@ -40,7 +40,12 @@ export interface SuppliedItem {
 }
 
 export interface SealedSuppliedItem {
-  ite: ItemDescriptorDto;
+  item: ItemDescriptorDto;
+  providedAmount: number;
+}
+
+export interface QueryParamSuppliedItem {
+  itemClass: string;
   providedAmount: number;
 }
 
@@ -83,29 +88,46 @@ export class FactoryRequirementsComponent {
       if (!isEmpty(this.requiredFactoryItems)) {
         return;
       }
-      const itemRequirements = params.getAll('factoryRequirement').map(e => JSON.parse(e) as QueryParamRequirement)
-      if (isEmpty(itemRequirements)) {
-        return;
-      }
-      this.requiredFactoryItems = await Promise.all(itemRequirements.map(async req => {
-        const item = await lastValueFrom(this.itemDescriptorService.findByClassName1(req.itemClass))
-        let recipeOrExtractor: RecipeDto | ExtractorDto | null = null
 
-        if (req.recipeClass) {
-          recipeOrExtractor = await lastValueFrom(this.recipeService.findByClassName(req.recipeClass))
-        }
-        if (req.extractorClass && item.extractedIn) {
-          recipeOrExtractor = Array.from(item.extractedIn).find(e => e.className === req.extractorClass) || null
-        }
+      await this.loadFactoryRequirement(params.getAll('factoryRequirement').map(e => JSON.parse(e) as QueryParamRequirement))
+      await this.loadSuppliedItems(params.getAll('suppliedItem').map(e => JSON.parse(e) as QueryParamSuppliedItem))
 
-        return this.createFactoryItemRequirement(item, recipeOrExtractor, req.requiredAmount)
-      }))
-      this.requiredFactoryItems.forEach(e => {
-        this.bindSubscriptions(e)
-      })
       await this.onRequirementChanged()
       this.updateQueryParams()
     })
+  }
+
+  private async loadFactoryRequirement(itemRequirements: QueryParamRequirement[]): Promise<void> {
+    if (isEmpty(itemRequirements)) {
+      return;
+    }
+    this.requiredFactoryItems = await Promise.all(itemRequirements.map(async req => {
+      const item = await lastValueFrom(this.itemDescriptorService.findByClassName1(req.itemClass))
+      let recipeOrExtractor: RecipeDto | ExtractorDto | null = null
+
+      if (req.recipeClass) {
+        recipeOrExtractor = await lastValueFrom(this.recipeService.findByClassName(req.recipeClass))
+      }
+      if (req.extractorClass && item.extractedIn) {
+        recipeOrExtractor = Array.from(item.extractedIn).find(e => e.className === req.extractorClass) || null
+      }
+
+      return this.createFactoryItemRequirement(item, recipeOrExtractor, req.requiredAmount)
+    }))
+    this.requiredFactoryItems.forEach(e => {
+      this.bindSubscriptions(e)
+    })
+  }
+
+  private async loadSuppliedItems(itemRequirements: QueryParamSuppliedItem[]): Promise<void> {
+    if (isEmpty(itemRequirements)) {
+      return;
+    }
+    this.suppliedItems = await Promise.all(itemRequirements.map(async req => {
+      const item = await lastValueFrom(this.itemDescriptorService.findByClassName1(req.itemClass))
+
+      return this.createSupplitedItem(item, req.providedAmount)
+    }))
   }
 
   addFactoryRequirement(item: ItemDescriptorDto | null = null, recipe: RecipeDto | ExtractorDto | null = null, amount: number = 0) {
@@ -124,13 +146,20 @@ export class FactoryRequirementsComponent {
     }))
   }
 
+  getSealedSuppliedItems(): SealedSuppliedItem[] {
+    return this.suppliedItems.filter(e => !isNil(e.item.value)).map(e => ({
+      item: e.item.value!!,
+      providedAmount: e.providedAmount.value
+    }))
+  }
+
   async onRequirementChanged() {
     const sealed = this.getSealedRequirements()
     const existing = this.graphSubject.value?.requirements
 
     if (!this.graphCreating && !isEqual(sealed, existing)) {
       this.graphCreating = true
-      const newGraph = new GraphNavigator(sealed, this.updateGraphSubject)
+      const newGraph = new GraphNavigator(sealed, this.getSealedSuppliedItems(), this.updateGraphSubject)
       const graphRequest = sealed.map(e => makeFactorySiteRequest(e))
       const graphResponse = await lastValueFrom(this.factoryPlannerControllerService.planFactorySite(graphRequest))
 
@@ -143,11 +172,18 @@ export class FactoryRequirementsComponent {
 
   updateQueryParams() {
     const factoryRequirement = this.getQueryParamRequirements()
+    const sealedSupplied = this.getSealedSuppliedItems().map(e => ({
+      ...e,
+      itemClass: e.item.className,
+      item: undefined,
+
+    }))
 
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
       queryParams: {
         factoryRequirement: factoryRequirement.map(e => JSON.stringify(e)),
+        suppliedItem: sealedSupplied.map(e => JSON.stringify(e)),
       },
       queryParamsHandling: 'merge',
     });
@@ -182,6 +218,23 @@ export class FactoryRequirementsComponent {
 
     const newAmount = new BehaviorSubject<number>(amount)
 
+    newItem.subscribe(value => {
+      if (isNil(value)) {
+        return
+      }
+      this.updateQueryParams()
+      this.graphSubject.value?.actualizeGraph(this.getSealedRequirements(), this.getSealedSuppliedItems())
+
+    })
+
+    newAmount.subscribe(value => {
+      if (isNil(value)) {
+        return
+      }
+      this.updateQueryParams()
+      this.graphSubject.value?.actualizeGraph(this.getSealedRequirements(), this.getSealedSuppliedItems())
+
+    })
     return {
       item: newItem,
       providedAmount: newAmount
@@ -204,7 +257,7 @@ export class FactoryRequirementsComponent {
     })
     requiredAmount.subscribe(value => {
       // TODO Changing amount deselect the recipe
-      this.graphSubject.value?.actualizeGraph(this.getSealedRequirements())
+      this.graphSubject.value?.actualizeGraph(this.getSealedRequirements(), this.getSealedSuppliedItems())
       this.updateQueryParams()
     })
 
@@ -212,11 +265,12 @@ export class FactoryRequirementsComponent {
   }
 
   private getQueryParamRequirements(): QueryParamRequirement[] {
-    const sealed = this.getSealedRequirements()
+    const sealedReq = this.getSealedRequirements()
 
-    return sealed.map(({item, manufacturing, requiredAmount}) => {
+    return sealedReq.map(({item, manufacturing, requiredAmount}) => {
       const recipeClass = isRecipe(manufacturing) ? manufacturing.className : undefined
       const extractorClass = isExtractor(manufacturing) ? manufacturing.className : undefined
+
       return ({
         itemClass: item.className,
         requiredAmount: requiredAmount,

@@ -11,6 +11,7 @@ import {CraftingSiteNodeImpl} from "./crafting-site.node";
 import {ItemSiteNodeImpl} from "./item-site.node";
 import {ExtractingSiteNodeImpl} from "./extracting-site.node";
 import {Subject} from "rxjs";
+import {SealedSuppliedItem} from "../factory-requirements.component";
 
 
 export type GraphNode = Node & (CraftingSiteNodeImpl) | ExtractingSiteNodeImpl | ItemSiteNodeImpl;
@@ -21,7 +22,8 @@ export class GraphNavigator {
   nodes: GraphNode[] = [];
   edges: GraphEdge[] = [];
 
-  constructor(public requirements: SealedRequirement[], private readonly updateGraphSubject: Subject<boolean>) {
+
+  constructor(public requirements: SealedRequirement[], private suppliedItems: SealedSuppliedItem[], readonly updateGraphSubject: Subject<boolean>) {
   }
 
 
@@ -48,6 +50,13 @@ export class GraphNavigator {
 
     return sum(requirements?.map(req => {
       return req.requiredAmount;
+    }))
+  }
+  getSuppliedTotal(className: string): number {
+    const requirements = this.suppliedItems.filter(e => !isNil(e.item) && e.item.className === className)
+
+    return sum(requirements?.map(req => {
+      return req.providedAmount;
     }));
   }
 
@@ -93,12 +102,15 @@ export class GraphNavigator {
     const totalRequired = sum(consumerEdges.map(edge => edge.totalOutputPerMinute))
     const totalProduced = sum(producerEdges.map(edge => edge.totalOutputPerMinute))
 
-    return totalProduced - totalRequired
+    return (totalProduced - totalRequired)
   }
 
-  actualizeGraph(requirements: SealedRequirement[] | undefined = undefined): void {
+  actualizeGraph(requirements: SealedRequirement[] | undefined = undefined, suppliedItems: SealedSuppliedItem[] | undefined = undefined): void {
     if (!isNil(requirements)) {
       this.requirements = requirements
+    }
+    if (!isNil(suppliedItems)) {
+      this.suppliedItems = suppliedItems
     }
     const itemNodes = this.nodes.filter(item => item instanceof ItemSiteNodeImpl)
 
@@ -181,7 +193,7 @@ export class GraphNavigator {
     const craftingSiteProducedItems = this.getOutgoingEdge(craftingSite).some(e => e.target === itemSite.id && e.source === craftingSite.id)
     const craftingSiteIngredients = this.getIncomingEdges(craftingSite).some(e => e.source === itemSite.id && e.target === craftingSite.id)
     const isCyclic = craftingSiteProducedItems && craftingSiteIngredients
-    console.log(craftingSite.id, '<->',  itemSite.id, isCyclic)
+    console.log(craftingSite.id, '<->', itemSite.id, isCyclic)
     return isCyclic
   }
 
@@ -217,6 +229,7 @@ export class GraphNavigator {
     callstack.push({recipe: recipe.id, item: productItem.id, requiredTotal: requiredTotal})
 
     const requiredTotalPerCycle = this.minuteToCycle(recipe, requiredTotal)
+    // - this.minuteToCycle(recipe, this.getSuppliedTotal(productItem.factorySiteTarget.className))
 
     return this.computeRecipeRequiredMachines(recipe, productItem, requiredTotalPerCycle)
   }
