@@ -186,14 +186,14 @@ export class GraphNavigator {
       }
     })
 
-    this.updateGraphSubject.next(true)
+    this.updateGraphSubject?.next(true)
   }
 
   private isCyclicRelationship(craftingSite: CraftingSiteNodeImpl, itemSite: ItemSiteNodeImpl): boolean {
     const craftingSiteProducedItems = this.getOutgoingEdge(craftingSite).some(e => e.target === itemSite.id && e.source === craftingSite.id)
     const craftingSiteIngredients = this.getIncomingEdges(craftingSite).some(e => e.source === itemSite.id && e.target === craftingSite.id)
     const isCyclic = craftingSiteProducedItems && craftingSiteIngredients
-    console.log(craftingSite.id, '<->', itemSite.id, isCyclic)
+
     return isCyclic
   }
 
@@ -322,5 +322,9 @@ export class GraphNavigator {
 
   private isEdgeExisting(edge: FactoryEdge): boolean {
     return this.edges.some(e => e.source === edge.source && e.target === edge.target)
+  }
+
+  getItemNodes(): ItemSiteNodeImpl[] {
+    return this.nodes.filter(e => e instanceof ItemSiteNodeImpl)
   }
 }

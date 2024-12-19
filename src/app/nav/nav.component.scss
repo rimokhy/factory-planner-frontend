@@ -25,10 +25,8 @@ h1.app-name {
   flex: 1 0 auto;
 }
 
-.main-content {
-  width: 90%;
-  margin: auto;
-}
-.content-wrapper-horizontal {
-}
 
+mat-sidenav-container.mat-drawer-container {
+  overflow: auto;
+  flex-grow: 1;
+}

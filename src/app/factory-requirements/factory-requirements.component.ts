@@ -19,6 +19,7 @@ import {SealedRequirement} from "./graph/node.factory";
 import {makeFactorySiteRequest} from "./item-site.request";
 import {AmountPickerComponent} from "../amount-picker/amount-picker.component";
 import {RecipePickerComponent} from "../recipe-picker/recipe-picker.component";
+import {CdkVirtualScrollViewport, ScrollingModule} from "@angular/cdk/scrolling";
 
 
 export interface QueryParamRequirement {
@@ -66,6 +67,7 @@ export const isRecipe = (recipeOrExtractor: RecipeDto | ExtractorDto | undefined
     ItemDescriptorPickerComponent,
     AmountPickerComponent,
     RecipePickerComponent,
+    ScrollingModule,
   ],
   templateUrl: './factory-requirements.component.html',
   styleUrl: './factory-requirements.component.scss'
@@ -155,7 +157,7 @@ export class FactoryRequirementsComponent {
 
   async onRequirementChanged() {
     const sealed = this.getSealedRequirements()
-    const existing = this.graphSubject.value?.requirements
+    const existing = this.graphSubject?.value?.requirements
 
     if (!this.graphCreating && !isEqual(sealed, existing)) {
       this.graphCreating = true

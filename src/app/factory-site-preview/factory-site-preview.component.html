@@ -1,26 +1,39 @@
-<mat-grid-list cols="4" gutterSize="1em" rowHeight="fit" [style.width]="'100%'" [style.height]="'700px'">
+<mat-grid-list cols="4" gutterSize="0px" rowHeight="fit" [style.width]="'100%'" class="page-content">
   <mat-grid-tile
-                 [colspan]="3"
-                 [rowspan]="2">
-    <mat-tab-group style="width: 100%;">
-      <mat-tab label="Graph view">
+    [colspan]="3"
+    [rowspan]="2">
+    <!--
+        <mat-tab-group>
+          <mat-tab label="Graph view" >
+    -->
 
-        @if (graphSubject | async; as graph) {
-          <app-factory-graph [graphSubject]="graphSubject" [requirements]="requirements"
+    @if (graphSubject | async; as graph) {
+          <app-factory-graph  [style.width]="'100%'"  [graphSubject]="graphSubject" [requirements]="requirements"
                              [updateGraphSubject]="updateGraphSubject"></app-factory-graph>
         }
 
+<!--
       </mat-tab>
-      <mat-tab label="List view"> Content 2</mat-tab>
+      <mat-tab label="List view">
+-->
+        <app-factory-list-view [graphSubject]="graphSubject"></app-factory-list-view>
+<!--
+      </mat-tab>
     </mat-tab-group>
+-->
   </mat-grid-tile>
   <mat-grid-tile
-                 [colspan]="1"
-                 [rowspan]="2">
+    [colspan]="1"
+    [rowspan]="2"
+  >
 
     <app-factory-requirements style="width: 100%;" [graphSubject]="graphSubject"
                               [updateGraphSubject]="updateGraphSubject"></app-factory-requirements>
   </mat-grid-tile>
 
 </mat-grid-list>
-
+<div class="sticky-bottom">
+  <button mat-fab aria-label="Example icon button with a delete icon">
+    <mat-icon>arrow_circle_right</mat-icon>
+  </button>
+</div>

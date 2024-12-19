@@ -6,6 +6,9 @@ import {FactoryGraphComponent} from "../factory-graph/factory-graph.component";
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {AsyncPipe, NgIf} from "@angular/common";
 import {MatGridListModule} from "@angular/material/grid-list";
+import {FactoryListViewComponent} from "../factory-list-view/factory-list-view.component";
+import {MatIconModule} from "@angular/material/icon";
+import {MatButtonModule} from "@angular/material/button";
 
 
 @Component({
@@ -18,7 +21,10 @@ import {MatGridListModule} from "@angular/material/grid-list";
     MatTab,
     NgIf,
     AsyncPipe,
-    MatGridListModule
+    MatGridListModule,
+    FactoryListViewComponent,
+    MatIconModule,
+    MatButtonModule,
   ],
   templateUrl: './factory-site-preview.component.html',
   styleUrl: './factory-site-preview.component.scss'
@@ -27,10 +33,7 @@ export class FactorySitePreviewComponent implements AfterContentInit {
   updateGraphSubject!: Subject<boolean>;
   graphSubject!: BehaviorSubject<GraphNavigator | null>
   @ViewChild(FactoryRequirementsComponent) requirements!: FactoryRequirementsComponent;
-  tiles= [
-    {text: 'Two', cols: 1, rows: 2, color: 'lightgreen'},
 
-  ];
   ngAfterContentInit(): void {
     this.graphSubject = new BehaviorSubject<GraphNavigator | null>(null)
     this.updateGraphSubject = new Subject()
