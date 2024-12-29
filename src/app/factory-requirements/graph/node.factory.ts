@@ -1,14 +1,9 @@
-import {
-  CraftingSiteNode,
-  ExtractingSiteNode, ExtractorDto,
-  FactoryNode,
-  ItemDescriptorDto,
-  ItemSiteNode, RecipeDto
-} from "../../factory-planner-api";
+import {ExtractorDto, FactoryNode, ItemDescriptorDto, RecipeDto} from "../../factory-planner-api";
 import {CraftingSiteNodeImpl} from "./crafting-site.node";
 import {ExtractingSiteNodeImpl} from "./extracting-site.node";
 import {ItemSiteNodeImpl} from "./item-site.node";
 import {Node} from "@swimlane/ngx-graph";
+import {ExtractionNode} from "../../extracting-site-config/extracting-site-config.service";
 
 export const isItemSiteNode = (site?: Node & { type?: FactoryNode.TypeEnum }): site is ItemSiteNodeImpl => {
   return site?.type === FactoryNode.TypeEnum.ItemSite
@@ -16,6 +11,10 @@ export const isItemSiteNode = (site?: Node & { type?: FactoryNode.TypeEnum }): s
 
 export const isExtractingSiteNode = (site?: Node & { type?: FactoryNode.TypeEnum }): site is ExtractingSiteNodeImpl => {
   return site?.type === FactoryNode.TypeEnum.ExtractorSite
+}
+
+export const isExtractionNode = (site?: Node & { type?: FactoryNode.TypeEnum }): site is ExtractionNode & Node => {
+  return site?.type === FactoryNode.TypeEnum.ExtractionNode
 }
 
 export const isCraftingSiteNode = (site?: Node & { type?: FactoryNode.TypeEnum }): site is CraftingSiteNodeImpl => {

@@ -2,6 +2,11 @@ import { NgModule, ModuleWithProviders, SkipSelf, Optional } from '@angular/core
 import { Configuration } from './configuration';
 import { HttpClient } from '@angular/common/http';
 
+import { FactoryPlannerControllerService } from './api/factory-planner-controller.service';
+import { ItemDescriptorControllerService } from './api/item-descriptor-controller.service';
+import { PowerGeneratorControllerService } from './api/power-generator-controller.service';
+import { RecipeControllerService } from './api/recipe-controller.service';
+import { TaskControllerService } from './api/task-controller.service';
 
 @NgModule({
   imports:      [],

@@ -12,6 +12,7 @@ import {
 } from "../factory-planner-api";
 import {BehaviorSubject, lastValueFrom} from "rxjs";
 import {AsyncPipe, NgIf} from "@angular/common";
+import {isNil} from "lodash";
 
 
 @Component({
@@ -52,8 +53,10 @@ export class RecipePickerComponent implements OnInit {
 
   ngOnInit(): void {
     this.itemSelected.subscribe(async item => {
-      if (item?.className) {
-        this.recipes.next(await lastValueFrom(this.recipeService.findAllByProducedItem(item?.className)))
+      const className = item?.className
+
+      if (!isNil(className)) {
+        this.recipes.next(await lastValueFrom(this.recipeService.findAllByProducedItem(className)))
 /*
  TODO: Changing item doesnt deselect the recipe
  When fixed, test reloading from requirements in path with recipe

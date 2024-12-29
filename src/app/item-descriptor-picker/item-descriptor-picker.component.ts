@@ -60,6 +60,6 @@ export class ItemDescriptorPickerComponent implements OnInit {
   }
 
   private async _filter(input: string): Promise<ItemDescriptorDto[]> {
-    return lastValueFrom(this.itemDescriptorService.searchByDisplayNameLike(input))
+    return lastValueFrom(this.itemDescriptorService.searchByDisplayNameLike1(input))
   }
 }

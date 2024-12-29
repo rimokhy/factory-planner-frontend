@@ -2,7 +2,6 @@ import {Component} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {RecipePickerComponent} from "./recipe-picker/recipe-picker.component";
 import {ItemDescriptorPickerComponent} from "./item-descriptor-picker/item-descriptor-picker.component";
-import {ItemDescriptorDto} from "./factory-planner-api";
 import {NgIf} from "@angular/common";
 import {Nav, NavComponent} from "./nav/nav.component";
 
@@ -23,10 +22,6 @@ export class AppComponent {
     {
       label: 'Plan Factory',
       route: '/factory-planning'
-    },
-    {
-      label: 'Map',
-      route: '/pranked'
     },
   ]
 

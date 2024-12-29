@@ -8,7 +8,7 @@
     -->
 
     @if (graphSubject | async; as graph) {
-          <app-factory-graph  [style.width]="'100%'"  [graphSubject]="graphSubject" [requirements]="requirements"
+          <app-factory-graph  [style.width]="'100%'"  [graphSubject]="graphSubject" [requirements]="requirements!!"
                              [updateGraphSubject]="updateGraphSubject"></app-factory-graph>
         }
 
@@ -33,7 +33,23 @@
 
 </mat-grid-list>
 <div class="sticky-bottom">
-  <button mat-fab aria-label="Example icon button with a delete icon">
-    <mat-icon>arrow_circle_right</mat-icon>
-  </button>
+  <div class="flexbox-row">
+    <button mat-fab aria-label="Add factory requirement" (click)="requirements?.addFactoryRequirement()">
+      <mat-icon>add</mat-icon>
+    </button>
+
+    <div style="margin: 4px"></div>
+
+    <button mat-fab aria-label="Supply item" (click)="requirements?.addFactoryRequirement()">
+      <mat-icon>upload</mat-icon>
+    </button>
+
+    <div style="margin: 4px"></div>
+
+
+    <button mat-fab aria-label="Save factory site" (click)="saveSite()">
+      <mat-icon>arrow_circle_right</mat-icon>
+    </button>
+
+  </div>
 </div>

@@ -1,8 +1,9 @@
 import {
   CraftingSiteNode,
   FactoryEdge,
+  FactoryNode,
   GraphFactoryNodeFactoryEdge,
-  GraphFactoryNodeFactoryEdgeNodesInner,
+  ItemDescriptorDto,
 } from "../../factory-planner-api";
 import {Edge, Node} from "@swimlane/ngx-graph";
 import {isNil, max, sum} from "lodash";
@@ -12,9 +13,10 @@ import {ItemSiteNodeImpl} from "./item-site.node";
 import {ExtractingSiteNodeImpl} from "./extracting-site.node";
 import {Subject} from "rxjs";
 import {SealedSuppliedItem} from "../factory-requirements.component";
+import {ExtractionNode} from "../../extracting-site-config/extracting-site-config.service";
 
 
-export type GraphNode = Node & (CraftingSiteNodeImpl) | ExtractingSiteNodeImpl | ItemSiteNodeImpl;
+export type GraphNode = Node & (CraftingSiteNodeImpl | ExtractingSiteNodeImpl | ItemSiteNodeImpl | (ExtractionNode & { factorySiteTarget: ItemDescriptorDto })) & { type: FactoryNode.TypeEnum};
 export type GraphEdge = Edge & FactoryEdge;
 
 
@@ -112,7 +114,7 @@ export class GraphNavigator {
     if (!isNil(suppliedItems)) {
       this.suppliedItems = suppliedItems
     }
-    const itemNodes = this.nodes.filter(item => item instanceof ItemSiteNodeImpl)
+    const itemNodes = this.nodes.filter(item => item instanceof ItemSiteNodeImpl) as ItemSiteNodeImpl[]
 
     this.edges.forEach(edge => {
       edge.totalOutputPerMinute = 0
@@ -139,13 +141,16 @@ export class GraphNavigator {
         .forEach(edge => {
           const actualProduced = this.computeLink(edge)!!
           const producedItem = this.nodes.find(node => node.id === edge.target)!!
-          const requiredItems = this.getTotalItemRequiredItems(producedItem)
+          const requiredItems = this.getTotalItemRequiredItems(producedItem as ItemSiteNodeImpl)
           const failedToMatchRequirement = actualProduced < requiredItems
 
-          if (failedToMatchRequirement && !this.isCyclicRelationship(craftingSite, producedItem)) {
+          if (failedToMatchRequirement &&
+            producedItem instanceof ItemSiteNodeImpl &&
+            craftingSite instanceof CraftingSiteNodeImpl &&
+            !this.isCyclicRelationship(craftingSite, producedItem)) {
             console.log('Recalculation', craftingSite.id, producedItem.id, actualProduced, requiredItems)
 
-            const requiredCycles = this.computeRecipe(craftingSite, producedItem, requiredItems)
+            const requiredCycles = this.computeRecipe(craftingSite, producedItem as ItemSiteNodeImpl, requiredItems)
 
             if (!isNil(requiredCycles)) {
               craftingSite.requiredMachines = requiredCycles
@@ -229,7 +234,6 @@ export class GraphNavigator {
     callstack.push({recipe: recipe.id, item: productItem.id, requiredTotal: requiredTotal})
 
     const requiredTotalPerCycle = this.minuteToCycle(recipe, requiredTotal)
-    // - this.minuteToCycle(recipe, this.getSuppliedTotal(productItem.factorySiteTarget.className))
 
     return this.computeRecipeRequiredMachines(recipe, productItem, requiredTotalPerCycle)
   }
@@ -272,7 +276,6 @@ export class GraphNavigator {
       const recipe = this.nodes.find(recipeNode => recipeNode.id === recipeEdge.source)
 
       if (recipe instanceof CraftingSiteNodeImpl) {
-        //  console.log('Wanna craft', item.id, 'with', recipe.id, ' to get ', requiredTotalPerMinute, ' / min')
         const requiredCycles = this.computeRecipe(recipe, item, requiredTotalPerMinute, callstack)
         const produced = this.computeLink(recipeEdge)
 
@@ -308,23 +311,19 @@ export class GraphNavigator {
     }
   }
 
-  private getOutgoingEdge(node: GraphFactoryNodeFactoryEdgeNodesInner): GraphEdge[] {
+   getOutgoingEdge(node: GraphNode): GraphEdge[] {
     return this.edges.filter(edge => edge.source === node.id)
   }
 
-  private getIncomingEdges(node: GraphFactoryNodeFactoryEdgeNodesInner): GraphEdge[] {
+   getIncomingEdges(node: GraphNode): GraphEdge[] {
     return this.edges.filter(edge => edge.target === node.id)
   }
 
-  private isNodeExisting(node: GraphFactoryNodeFactoryEdgeNodesInner): boolean {
+  private isNodeExisting(node: GraphNode): boolean {
     return this.nodes.some(e => e.id === node.id)
   }
 
   private isEdgeExisting(edge: FactoryEdge): boolean {
     return this.edges.some(e => e.source === edge.source && e.target === edge.target)
-  }
-
-  getItemNodes(): ItemSiteNodeImpl[] {
-    return this.nodes.filter(e => e instanceof ItemSiteNodeImpl)
   }
 }

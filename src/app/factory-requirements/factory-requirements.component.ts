@@ -104,7 +104,7 @@ export class FactoryRequirementsComponent {
       return;
     }
     this.requiredFactoryItems = await Promise.all(itemRequirements.map(async req => {
-      const item = await lastValueFrom(this.itemDescriptorService.findByClassName1(req.itemClass))
+      const item = await lastValueFrom(this.itemDescriptorService.findByClassName2(req.itemClass))
       let recipeOrExtractor: RecipeDto | ExtractorDto | null = null
 
       if (req.recipeClass) {
@@ -126,7 +126,7 @@ export class FactoryRequirementsComponent {
       return;
     }
     this.suppliedItems = await Promise.all(itemRequirements.map(async req => {
-      const item = await lastValueFrom(this.itemDescriptorService.findByClassName1(req.itemClass))
+      const item = await lastValueFrom(this.itemDescriptorService.findByClassName2(req.itemClass))
 
       return this.createSupplitedItem(item, req.providedAmount)
     }))

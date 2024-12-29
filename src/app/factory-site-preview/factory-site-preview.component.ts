@@ -32,11 +32,15 @@ import {MatButtonModule} from "@angular/material/button";
 export class FactorySitePreviewComponent implements AfterContentInit {
   updateGraphSubject!: Subject<boolean>;
   graphSubject!: BehaviorSubject<GraphNavigator | null>
-  @ViewChild(FactoryRequirementsComponent) requirements!: FactoryRequirementsComponent;
+  @ViewChild(FactoryRequirementsComponent) requirements?: FactoryRequirementsComponent;
 
   ngAfterContentInit(): void {
     this.graphSubject = new BehaviorSubject<GraphNavigator | null>(null)
     this.updateGraphSubject = new Subject()
   }
 
+  saveSite() {
+    // is valid ?
+
+  }
 }
