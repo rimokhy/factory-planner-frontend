@@ -3,7 +3,7 @@ import {CraftingSiteNodeImpl} from "./crafting-site.node";
 import {ExtractingSiteNodeImpl} from "./extracting-site.node";
 import {ItemSiteNodeImpl} from "./item-site.node";
 import {Node} from "@swimlane/ngx-graph";
-import {ExtractionNode} from "../../extracting-site-config/extracting-site-config.service";
+import {ExtractionNode, Purity, PurityModifier} from "../../extracting-site-config/extracting-site-config.service";
 
 export const isItemSiteNode = (site?: Node & { type?: FactoryNode.TypeEnum }): site is ItemSiteNodeImpl => {
   return site?.type === FactoryNode.TypeEnum.ItemSite
@@ -42,8 +42,19 @@ export const createNode = (node: Node): FactoryNode => {
       node.id
     )
   }
+
   throw new Error('wouf')
 }
+
+export const calculateExtractingSpeed = (extractor: ExtractorDto, purity: Purity, overclockPercentage: number): number => {
+  if (overclockPercentage <= 0 && overclockPercentage > 250) {
+    throw new Error('Invalid overclock setting')
+  }
+  const cyclePerMinute = 60 / extractor.extractCycleTime
+  const itemPerMinute = extractor.itemsPerCycle * cyclePerMinute
+
+  return (PurityModifier[purity] * overclockPercentage) / 100 * itemPerMinute
+};
 
 export interface SealedRequirement {
   item: ItemDescriptorDto;

@@ -7,7 +7,15 @@ import {
 } from "../../factory-planner-api";
 import {Edge, Node} from "@swimlane/ngx-graph";
 import {isNil, max, sum} from "lodash";
-import {createNode, isCraftingSiteNode, isExtractingSiteNode, isItemSiteNode, SealedRequirement} from "./node.factory";
+import {
+  calculateExtractingSpeed,
+  createNode,
+  isCraftingSiteNode,
+  isExtractingSiteNode,
+  isExtractionNode,
+  isItemSiteNode,
+  SealedRequirement
+} from "./node.factory";
 import {CraftingSiteNodeImpl} from "./crafting-site.node";
 import {ItemSiteNodeImpl} from "./item-site.node";
 import {ExtractingSiteNodeImpl} from "./extracting-site.node";
@@ -75,6 +83,9 @@ export class GraphNavigator {
     }
     if (isExtractingSiteNode(source) && isItemSiteNode(target)) {
       return edge.totalOutputPerMinute
+    }
+    if (isExtractingSiteNode(target) && isExtractionNode(source)) {
+      return calculateExtractingSpeed(target.automaton, source.purity, source.overclockProfile)
     }
     return undefined
   }

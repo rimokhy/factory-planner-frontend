@@ -33,15 +33,6 @@ export interface ExtractionNode {
   providedIn: "root"
 })
 export class ExtractingSiteService {
-  calculateExtractingSpeed(extractor: ExtractorDto, purity: Purity, overclockPercentage: number): number {
-    if (overclockPercentage <= 0 && overclockPercentage > 250) {
-      throw new Error('Invalid overclock setting')
-    }
-    const cyclePerMinute = 60 / extractor.extractCycleTime
-    const itemPerMinute = extractor.itemsPerCycle * cyclePerMinute
-
-    return (PurityModifier[purity] * overclockPercentage) / 100 * itemPerMinute
-  }
 
   getNodesOptions(): Purity[] {
     return Object.keys(Purity) as unknown as Purity[]

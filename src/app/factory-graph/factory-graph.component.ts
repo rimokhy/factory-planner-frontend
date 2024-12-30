@@ -84,7 +84,6 @@ export class FactoryGraphComponent implements OnInit {
     if (isItemSiteNode(nodeClicked) && this.requirements.getSealedRequirements().every(e => e.item.className !== nodeClicked.factorySiteTarget.className)) {
       this.requirements.addFactoryRequirement(nodeClicked.factorySiteTarget)
       this.requirements.onRequirementChanged()
-      this.requirements.updateQueryParams()
     }
   }
 
@@ -135,4 +134,16 @@ export class FactoryGraphComponent implements OnInit {
   }
 
   protected readonly isExtractionNode = isExtractionNode;
+
+  getNodeHeight(node: GraphNode): number {
+    if (isExtractionNode(node)) {
+      return 200
+    }
+
+    return 100
+  }
+
+  getNodeWidth(node: any): number {
+    return 250
+  }
 }

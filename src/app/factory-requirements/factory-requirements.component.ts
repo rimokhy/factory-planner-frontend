@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {MatIcon} from "@angular/material/icon";
 import {MatListModule} from "@angular/material/list";
 import {MatButtonModule} from "@angular/material/button";
@@ -77,6 +77,7 @@ export class FactoryRequirementsComponent {
   suppliedItems: SuppliedItem[] = []
   @Input() graphSubject!: BehaviorSubject<GraphNavigator | null>
   @Input() updateGraphSubject!: Subject<boolean>;
+  @Output() requirementUpdated: EventEmitter<undefined> = new EventEmitter<undefined>()
   private graphCreating = false
 
   constructor(
@@ -86,20 +87,13 @@ export class FactoryRequirementsComponent {
     private readonly recipeService: RecipeControllerService,
     private readonly factoryPlannerControllerService: FactoryPlannerControllerService,
   ) {
-    this.activatedRoute.queryParamMap.pipe(take(1)).subscribe(async params => {
-      if (!isEmpty(this.requiredFactoryItems)) {
-        return;
-      }
-
-      await this.loadFactoryRequirement(params.getAll('factoryRequirement').map(e => JSON.parse(e) as QueryParamRequirement))
-      await this.loadSuppliedItems(params.getAll('suppliedItem').map(e => JSON.parse(e) as QueryParamSuppliedItem))
-
-      await this.onRequirementChanged()
-      this.updateQueryParams()
-    })
   }
 
-  private async loadFactoryRequirement(itemRequirements: QueryParamRequirement[]): Promise<void> {
+  isFilled() {
+    return !isEmpty(this.requiredFactoryItems)
+  }
+
+  async loadFactoryRequirement(itemRequirements: QueryParamRequirement[]): Promise<void> {
     if (isEmpty(itemRequirements)) {
       return;
     }
@@ -121,7 +115,7 @@ export class FactoryRequirementsComponent {
     })
   }
 
-  private async loadSuppliedItems(itemRequirements: QueryParamSuppliedItem[]): Promise<void> {
+  async loadSuppliedItems(itemRequirements: QueryParamSuppliedItem[]): Promise<void> {
     if (isEmpty(itemRequirements)) {
       return;
     }
@@ -170,32 +164,14 @@ export class FactoryRequirementsComponent {
       this.graphSubject.next(newGraph)
       this.graphCreating = false
     }
-  }
-
-  updateQueryParams() {
-    const factoryRequirement = this.getQueryParamRequirements()
-    const sealedSupplied = this.getSealedSuppliedItems().map(e => ({
-      ...e,
-      itemClass: e.item.className,
-      item: undefined,
-
-    }))
-
-    this.router.navigate([], {
-      relativeTo: this.activatedRoute,
-      queryParams: {
-        factoryRequirement: factoryRequirement.map(e => JSON.stringify(e)),
-        suppliedItem: sealedSupplied.map(e => JSON.stringify(e)),
-      },
-      queryParamsHandling: 'merge',
-    });
+    this.requirementUpdated.emit()
   }
 
   onRequirementRemoved(idx: number) {
     this.requiredFactoryItems = this.requiredFactoryItems.filter((_, index) => index !== idx);
 
-    this.updateQueryParams()
     this.onRequirementChanged()
+
   }
 
   onSuppliedItemRemoved(idx: number) {
@@ -224,7 +200,7 @@ export class FactoryRequirementsComponent {
       if (isNil(value)) {
         return
       }
-      this.updateQueryParams()
+      this.requirementUpdated.emit()
       this.graphSubject.value?.actualizeGraph(this.getSealedRequirements(), this.getSealedSuppliedItems())
 
     })
@@ -233,7 +209,7 @@ export class FactoryRequirementsComponent {
       if (isNil(value)) {
         return
       }
-      this.updateQueryParams()
+      this.requirementUpdated.emit()
       this.graphSubject.value?.actualizeGraph(this.getSealedRequirements(), this.getSealedSuppliedItems())
 
     })
@@ -251,34 +227,16 @@ export class FactoryRequirementsComponent {
         return
       }
       this.onRequirementChanged()
-      this.updateQueryParams()
     })
     manufacturing.subscribe(value => {
       this.onRequirementChanged()
-      this.updateQueryParams()
     })
     requiredAmount.subscribe(value => {
       // TODO Changing amount deselect the recipe
       this.graphSubject.value?.actualizeGraph(this.getSealedRequirements(), this.getSealedSuppliedItems())
-      this.updateQueryParams()
+      this.requirementUpdated.emit()
     })
 
     return req
-  }
-
-  private getQueryParamRequirements(): QueryParamRequirement[] {
-    const sealedReq = this.getSealedRequirements()
-
-    return sealedReq.map(({item, manufacturing, requiredAmount}) => {
-      const recipeClass = isRecipe(manufacturing) ? manufacturing.className : undefined
-      const extractorClass = isExtractor(manufacturing) ? manufacturing.className : undefined
-
-      return ({
-        itemClass: item.className,
-        requiredAmount: requiredAmount,
-        recipeClass,
-        extractorClass
-      });
-    })
   }
 }

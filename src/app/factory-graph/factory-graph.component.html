@@ -4,6 +4,7 @@
       class=" graph-preview"
       [links]="graph.edges"
       [nodes]="graph.nodes"
+      [draggingEnabled]="false"
       [update$]="updateGraphSubject"
       layout="dagre"
     >
@@ -14,26 +15,11 @@
         </svg:marker>
       </ng-template>
 
-      <ng-template #clusterTemplate let-cluster>
-        <svg:g class="node cluster">
-          <svg:text alignment-baseline="top" [attr.x]="10" [attr.y]="cluster.dimension.height / 2">
-            {{ cluster.label }}
-          </svg:text>
-          <svg:rect
-            rx="5"
-            ry="5"
-            [attr.width]="cluster.dimension.width"
-            [attr.height]="cluster.dimension.height"
-            [attr.fill]="cluster.data.color"
-          />
-        </svg:g>
-      </ng-template>
-
       <ng-template #nodeTemplate let-node>
 
         <svg:g>
-          <svg:foreignObject [attr.width]="250" [attr.height]="100">
-            <mat-card appearance="outlined" style="width: 250px; height: 100px">
+          <svg:foreignObject [attr.width]="getNodeWidth(node)" [attr.height]="getNodeHeight(node)">
+            <mat-card appearance="outlined" style="width: 250px; height: 100%">
               <mat-card-content>
                 <div  class="graph-content-container">
                   <div class="graph-image-container">
