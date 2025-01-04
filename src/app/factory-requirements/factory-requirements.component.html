@@ -1,22 +1,4 @@
 <div>
-  @for (supply of suppliedItems; track supply; let idx = $index) {
-    <div class="flexbox-column">
-      <div class="flexbox-row" style="justify-content: space-between">
-        <div style="width: 70%;">
-          <app-item-descriptor-picker
-            [title]="'Provided item'"
-            [itemSelected]="supply.item"
-            (onClear)="onSuppliedItemRemoved(idx)"></app-item-descriptor-picker>
-
-        </div>
-        <app-amount-picker [amountSelected]="supply.providedAmount"></app-amount-picker>
-
-      </div>
-
-
-    </div>
-  }
-
   @for (factoryRequirement of requiredFactoryItems; track factoryRequirement; let idx = $index) {
     <div class="flexbox-column">
       <div class="flexbox-row" style="justify-content: space-between;">
@@ -32,8 +14,6 @@
         </app-recipe-picker>
         <app-amount-picker [amountSelected]="factoryRequirement.requiredAmount"></app-amount-picker>
       </div>
-
-
     </div>
   }
 

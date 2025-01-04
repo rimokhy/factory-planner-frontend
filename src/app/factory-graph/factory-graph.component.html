@@ -23,8 +23,8 @@
               <mat-card-content>
                 <div  class="graph-content-container">
                   <div class="graph-image-container">
-                    <xhtml:img [matTooltip]="getNodeTooltip(node)" [class]="'png-icon'"
-                               [attr.src]="getNodeIcon(node)"></xhtml:img>
+                    <img mat-card-image [matTooltip]="getNodeTooltip(node)" [class]="'png-icon'"
+                         [attr.src]="getNodeIcon(node)">
                     <div class="required-number" *ngIf="isItemSiteNode(node)">
                       {{ graph.displayNumber(graph.getItemNumberDisplay(node)) }}/min
                     </div>
@@ -33,46 +33,9 @@
                     </div>
                   </div>
                   <button mat-button (click)="onNodeClick(node)">{{ node.label }}</button>
-
-                  <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="isExtractingSiteNode(node)"
-                          class="graph-button"
-                          aria-label="Configure extracting nodes"
-                          matTooltip="Configure extracting nodes"
-                          (click)="onExtractingSiteClicked(node)"
-                  >
-                    <mat-icon>add</mat-icon>
-                  </button>
                 </div>
-
-
-                @if (isExtractionNode(node)) {
-                  <div class="flexbox-column">
-                    <mat-form-field>
-                      <mat-label>Overclocking profile</mat-label>
-                      <input matInput type="number" [(ngModel)]="node.overclockProfile">
-                    </mat-form-field>
-
-                    <mat-slider min="1" max="250" step="0.5" style="width: 100%;">
-                      <input matSliderThumb [(ngModel)]="node.overclockProfile">
-                    </mat-slider>
-                  </div>
-                }
-
-                <mat-menu #menu="matMenu">
-                  @for (entry of  extractingSiteConfig.getNodesOptions(); track entry) {
-                    <button mat-menu-item (click)="addExtractingSiteNode(entry, node)">
-                      <span>{{ Purity[entry] }}</span>
-                    </button>
-                  }
-                </mat-menu>
-
               </mat-card-content>
             </mat-card>
-
-            <div>
-
-
-            </div>
           </svg:foreignObject>
 
 

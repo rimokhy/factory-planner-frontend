@@ -49,14 +49,12 @@ body {
   height: 100%;
 }
 
-
-
-
 @include mat.core();
 @include mat.color-variants-backwards-compatibility($theme);
 
 .mat-grid-tile-content {
   width: 100%;
+  overflow: auto;
   margin-right: 1em;
   display: flex !important;
   justify-content: flex-start !important;

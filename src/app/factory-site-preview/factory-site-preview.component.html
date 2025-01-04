@@ -7,10 +7,7 @@
           <mat-tab label="Graph view" >
     -->
 
-    @if (graphSubject | async; as graph) {
-          <app-factory-graph  [style.width]="'100%'"  [graphSubject]="graphSubject" [requirements]="requirements"
-                             [updateGraphSubject]="updateGraphSubject"></app-factory-graph>
-        }
+    <app-factory-graph  [style.width]="'100%'" [graphSubject]="graphSubject" [updateGraphSubject]="updateGraphSubject" (nodeClicked)="nodeClicked($event)"></app-factory-graph>
 
 <!--
       </mat-tab>
@@ -27,29 +24,49 @@
     [rowspan]="2"
   >
 
-    <app-factory-requirements style="width: 100%;" [graphSubject]="graphSubject"
-                              [updateGraphSubject]="updateGraphSubject"
-                              (requirementUpdated)="requirementsUpdated()"
-    ></app-factory-requirements>
+    <mat-tab-group>
+      <mat-tab label="Requirements">
+        <app-factory-requirements style="width: 100%;"
+                                  (requirementUpdated)="reload($event)"
+        ></app-factory-requirements>
+      </mat-tab>
+
+      <mat-tab label="Supply">
+        <app-factory-supplies  style="width: 100%;" (suppliedItemsUpdated)="reload($event)">
+
+        </app-factory-supplies>
+      </mat-tab>
+      <mat-tab label="Extraction">
+        <app-extraction-config [graphSubject]="graphSubject" [updateGraphSubject]="updateGraphSubject" (configChanged)="reload($event)"></app-extraction-config>
+      </mat-tab>
+
+    </mat-tab-group>
+
   </mat-grid-tile>
 
 </mat-grid-list>
 <div class="sticky-bottom">
   <div class="flexbox-row">
-    <button mat-fab aria-label="Add factory requirement" (click)="requirements.addFactoryRequirement()">
-      <mat-icon>add</mat-icon>
+    <button mat-fab aria-label="Add factory requirement"
+            matTooltip="Add a factory requirement"
+            (click)="requirements.addFactoryRequirement()">
+      <mat-icon>download</mat-icon>
     </button>
 
     <div style="margin: 4px"></div>
 
-    <button mat-fab aria-label="Supply item" (click)="requirements.addFactoryRequirement()">
+    <button mat-fab aria-label="Supply item"
+            matTooltip="Supply an item"
+            (click)="suppliesComponent.addSuppliedItem()">
       <mat-icon>upload</mat-icon>
     </button>
 
     <div style="margin: 4px"></div>
 
 
-    <button mat-fab aria-label="Save factory site" (click)="saveSite()">
+    <button mat-fab aria-label="Save factory site"
+            matTooltip="Save your factory site"
+            (click)="saveSite()">
       <mat-icon>arrow_circle_right</mat-icon>
     </button>
 

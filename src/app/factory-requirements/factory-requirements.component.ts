@@ -74,18 +74,11 @@ export const isRecipe = (recipeOrExtractor: RecipeDto | ExtractorDto | undefined
 })
 export class FactoryRequirementsComponent {
   requiredFactoryItems: Requirement[] = []
-  suppliedItems: SuppliedItem[] = []
-  @Input() graphSubject!: BehaviorSubject<GraphNavigator | null>
-  @Input() updateGraphSubject!: Subject<boolean>;
-  @Output() requirementUpdated: EventEmitter<undefined> = new EventEmitter<undefined>()
-  private graphCreating = false
+  @Output() requirementUpdated: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   constructor(
-    private readonly activatedRoute: ActivatedRoute,
-    private readonly router: Router,
     private readonly itemDescriptorService: ItemDescriptorControllerService,
     private readonly recipeService: RecipeControllerService,
-    private readonly factoryPlannerControllerService: FactoryPlannerControllerService,
   ) {
   }
 
@@ -115,23 +108,8 @@ export class FactoryRequirementsComponent {
     })
   }
 
-  async loadSuppliedItems(itemRequirements: QueryParamSuppliedItem[]): Promise<void> {
-    if (isEmpty(itemRequirements)) {
-      return;
-    }
-    this.suppliedItems = await Promise.all(itemRequirements.map(async req => {
-      const item = await lastValueFrom(this.itemDescriptorService.findByClassName2(req.itemClass))
-
-      return this.createSupplitedItem(item, req.providedAmount)
-    }))
-  }
-
   addFactoryRequirement(item: ItemDescriptorDto | null = null, recipe: RecipeDto | ExtractorDto | null = null, amount: number = 0) {
     return this.requiredFactoryItems.push(this.bindSubscriptions(this.createFactoryItemRequirement(item, recipe, amount)))
-  }
-
-  addSupplitedItem(item: ItemDescriptorDto | null = null) {
-    return this.suppliedItems.push(this.createSupplitedItem(item))
   }
 
   getSealedRequirements(): SealedRequirement[] {
@@ -142,41 +120,10 @@ export class FactoryRequirementsComponent {
     }))
   }
 
-  getSealedSuppliedItems(): SealedSuppliedItem[] {
-    return this.suppliedItems.filter(e => !isNil(e.item.value)).map(e => ({
-      item: e.item.value!!,
-      providedAmount: e.providedAmount.value
-    }))
-  }
-
-  async onRequirementChanged() {
-    const sealed = this.getSealedRequirements()
-    const existing = this.graphSubject?.value?.requirements
-
-    if (!this.graphCreating && !isEqual(sealed, existing)) {
-      this.graphCreating = true
-      const newGraph = new GraphNavigator(sealed, this.getSealedSuppliedItems(), this.updateGraphSubject)
-      const graphRequest = sealed.map(e => makeFactorySiteRequest(e))
-      const graphResponse = await lastValueFrom(this.factoryPlannerControllerService.planFactorySite(graphRequest))
-
-      newGraph.populate(graphResponse)
-
-      this.graphSubject.next(newGraph)
-      this.graphCreating = false
-    }
-    this.requirementUpdated.emit()
-  }
-
   onRequirementRemoved(idx: number) {
     this.requiredFactoryItems = this.requiredFactoryItems.filter((_, index) => index !== idx);
 
-    this.onRequirementChanged()
-
-  }
-
-  onSuppliedItemRemoved(idx: number) {
-    this.suppliedItems = this.suppliedItems.filter((_, index) => index !== idx);
-    this.graphSubject.value?.actualizeGraph(this.getSealedRequirements())
+    this.requirementUpdated.emit(true)
   }
 
   private createFactoryItemRequirement(item: ItemDescriptorDto | null, recipe: RecipeDto | ExtractorDto | null, amount: number = 0): Requirement {
@@ -191,34 +138,6 @@ export class FactoryRequirementsComponent {
     }
   }
 
-  private createSupplitedItem(item: ItemDescriptorDto | null, amount: number = 0): SuppliedItem {
-    const newItem = new BehaviorSubject<ItemDescriptorDto | null>(item)
-
-    const newAmount = new BehaviorSubject<number>(amount)
-
-    newItem.subscribe(value => {
-      if (isNil(value)) {
-        return
-      }
-      this.requirementUpdated.emit()
-      this.graphSubject.value?.actualizeGraph(this.getSealedRequirements(), this.getSealedSuppliedItems())
-
-    })
-
-    newAmount.subscribe(value => {
-      if (isNil(value)) {
-        return
-      }
-      this.requirementUpdated.emit()
-      this.graphSubject.value?.actualizeGraph(this.getSealedRequirements(), this.getSealedSuppliedItems())
-
-    })
-    return {
-      item: newItem,
-      providedAmount: newAmount
-    }
-  }
-
   private bindSubscriptions(req: Requirement): Requirement {
     const {item, requiredAmount, manufacturing} = req
 
@@ -226,15 +145,13 @@ export class FactoryRequirementsComponent {
       if (isNil(value)) {
         return
       }
-      this.onRequirementChanged()
+      this.requirementUpdated.emit(true)
     })
     manufacturing.subscribe(value => {
-      this.onRequirementChanged()
+      this.requirementUpdated.emit(true)
     })
     requiredAmount.subscribe(value => {
-      // TODO Changing amount deselect the recipe
-      this.graphSubject.value?.actualizeGraph(this.getSealedRequirements(), this.getSealedSuppliedItems())
-      this.requirementUpdated.emit()
+      this.requirementUpdated.emit(false)
     })
 
     return req

@@ -1,10 +1,4 @@
-import {
-  CraftingMachineDto,
-  CraftingSiteNode, ExtractingSiteNode, ExtractorDto,
-  FactoryNode,
-  ItemDescriptorDto,
-  RecipeDto
-} from "../../factory-planner-api";
+import {ExtractingSiteNode, ExtractorDto, FactoryNode, ItemDescriptorDto} from "../../factory-planner-api";
 
 export class ExtractingSiteNodeImpl implements ExtractingSiteNode {
   type = FactoryNode.TypeEnum.ExtractorSite;
