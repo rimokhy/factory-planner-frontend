@@ -104,7 +104,6 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
     if (!this.graphCreating && !isEqual(sealed, existing)) {
       this.graphCreating = true
       const oldExtractionConfig = this.extractionComponent.sealed()
-      console.log('old extraction config', oldExtractionConfig)
       const newGraph = new GraphNavigator(sealed, this.suppliesComponent.getSealedSuppliedItems(), this.updateGraphSubject)
       const graphRequest = sealed.map(e => makeFactorySiteRequest(e))
       const graphResponse = await lastValueFrom(this.factoryPlannerControllerService.planFactorySite(graphRequest))
@@ -114,6 +113,7 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
 
       this.graphSubject.next(newGraph)
       this.extractionComponent.loadExtractionNode(oldExtractionConfig)
+      this.actualizeGraph()
 
       this.updateGraphSubject.next(true)
       this.graphCreating = false

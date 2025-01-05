@@ -52,7 +52,6 @@ export class GraphNavigator {
     })
 
 
-    this.actualizeGraph()
   }
 
   clear(...types: FactoryNode.TypeEnum[]) {

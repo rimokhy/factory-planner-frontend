@@ -22,6 +22,7 @@ import {MatInputModule} from "@angular/material/input";
 import {MatSliderModule} from "@angular/material/slider";
 
 import {FormControl, FormsModule, Validators} from "@angular/forms";
+import {isRecipe} from "../factory-requirements/factory-requirements.component";
 
 @Component({
   selector: 'app-factory-graph',
