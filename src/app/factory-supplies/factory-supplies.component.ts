@@ -11,6 +11,7 @@ import {
 import {isEmpty, isNil} from "lodash";
 import {ItemDescriptorControllerService, ItemDescriptorDto} from "../factory-planner-api";
 import {MatDivider} from "@angular/material/divider";
+import {CdkListbox} from "@angular/cdk/listbox";
 
 @Component({
   selector: 'app-factory-supplies',
@@ -19,7 +20,8 @@ import {MatDivider} from "@angular/material/divider";
     AmountPickerComponent,
     ItemDescriptorPickerComponent,
     RecipePickerComponent,
-    MatDivider
+    MatDivider,
+    CdkListbox
   ],
   templateUrl: './factory-supplies.component.html',
   styleUrl: './factory-supplies.component.scss'

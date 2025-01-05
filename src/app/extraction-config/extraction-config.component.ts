@@ -15,6 +15,7 @@ import {MatMenuModule} from "@angular/material/menu";
 import {MatDividerModule} from "@angular/material/divider";
 import {isNil, remove} from "lodash";
 import {Edge, Node} from "@swimlane/ngx-graph";
+import {CdkListbox} from "@angular/cdk/listbox";
 
 function randomString(len: number) {
   const p = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -55,7 +56,8 @@ export type QueryParamExtractionNode = ExtractingNode & { siteId: string }
     MatIcon,
     MatIconButton,
     MatMenuModule,
-    MatDividerModule
+    MatDividerModule,
+    CdkListbox
   ],
   templateUrl: './extraction-config.component.html',
   styleUrl: './extraction-config.component.scss'

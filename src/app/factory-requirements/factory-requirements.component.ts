@@ -20,6 +20,7 @@ import {makeFactorySiteRequest} from "./item-site.request";
 import {AmountPickerComponent} from "../amount-picker/amount-picker.component";
 import {RecipePickerComponent} from "../recipe-picker/recipe-picker.component";
 import {CdkVirtualScrollViewport, ScrollingModule} from "@angular/cdk/scrolling";
+import {CdkListbox} from "@angular/cdk/listbox";
 
 
 export interface QueryParamRequirement {
@@ -68,6 +69,7 @@ export const isRecipe = (recipeOrExtractor: RecipeDto | ExtractorDto | undefined
     AmountPickerComponent,
     RecipePickerComponent,
     ScrollingModule,
+    CdkListbox,
   ],
   templateUrl: './factory-requirements.component.html',
   styleUrl: './factory-requirements.component.scss'
