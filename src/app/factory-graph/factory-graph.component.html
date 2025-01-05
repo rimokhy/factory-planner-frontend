@@ -23,17 +23,26 @@
               <mat-card-content>
                 <div  class="graph-content-container">
                   <div class="graph-image-container">
-                    <img mat-card-image [matTooltip]="getNodeTooltip(node)" [class]="'png-icon'"
+                    <img [alt]="getNodeTooltip(node)" mat-card-image [matTooltip]="getNodeTooltip(node)" [class]="'png-icon'"
                          [attr.src]="getNodeIcon(node)">
                     <div class="required-number" *ngIf="isItemSiteNode(node)">
-                      {{ graph.displayNumber(graph.getItemNumberDisplay(node)) }}/min
+                      {{ graph.displayNumber(graph.getBalance(node)) }}/min
                     </div>
                     <div class="required-number" *ngIf="isCraftingSiteNode(node)">
                       x{{ graph.displayNumber(node.requiredMachines) }}
                     </div>
                   </div>
                   <button mat-button (click)="onNodeClick(node)">{{ node.label }}</button>
+                  <div *ngIf="isExtractingSiteNode(node)">
+                    {{ graph.displayNumber(graph.getBalance(node)) }}
+                  </div>
+
+                  @if (graph.getBalance(node) < 0 && !isExtractionNode(node)) {
+                    <mat-icon style="color: red; position: absolute; top: 3px; right: 3px;">error</mat-icon>
+                  }
+
                 </div>
+
               </mat-card-content>
             </mat-card>
           </svg:foreignObject>

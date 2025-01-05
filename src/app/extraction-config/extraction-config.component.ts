@@ -1,21 +1,20 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {AmountPickerComponent} from "../amount-picker/amount-picker.component";
-import {ItemDescriptorPickerComponent} from "../item-descriptor-picker/item-descriptor-picker.component";
-import {RecipePickerComponent} from "../recipe-picker/recipe-picker.component";
 import {ExtractingSiteNodeImpl} from "../factory-requirements/graph/extracting-site.node";
 import {FormsModule} from "@angular/forms";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {MatSliderModule} from "@angular/material/slider";
 import {MatCardModule} from "@angular/material/card";
-import {BehaviorSubject, Subject} from "rxjs";
+import {BehaviorSubject, filter, Subject, take} from "rxjs";
 import {GraphNavigator} from "../factory-requirements/graph/graph-navigator";
-import {FactoryNode} from "../factory-planner-api";
+import {ExtractingNode, FactoryNode} from "../factory-planner-api";
 import {MatSelectModule} from "@angular/material/select";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatMenuModule} from "@angular/material/menu";
 import {MatDividerModule} from "@angular/material/divider";
+import {isNil, remove} from "lodash";
+import {Edge, Node} from "@swimlane/ngx-graph";
 
 function randomString(len: number) {
   const p = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -37,16 +36,15 @@ export const PurityModifier: Record<Purity, number> = {
 
 export interface ExtractionNode {
   purity: Purity
-  overclockProfile: number,
+  overclock: number,
 }
+
+export type QueryParamExtractionNode = ExtractingNode & { siteId: string }
 
 @Component({
   selector: 'app-extraction-config',
   standalone: true,
   imports: [
-    AmountPickerComponent,
-    ItemDescriptorPickerComponent,
-    RecipePickerComponent,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -75,37 +73,12 @@ export class ExtractionConfigComponent {
     return extractingSites as ExtractingSiteNodeImpl[]
   }
 
-  getExtractingNodes(site: ExtractingSiteNodeImpl): ExtractionNode[] {
+  getExtractingNodes(site: ExtractingSiteNodeImpl): (ExtractionNode & Node)[] {
     const extractingEdges = this.graphSubject.value?.getIncomingEdges(site) || []
     const graphNodes = this.graphSubject.value?.nodes || []
 
-    return graphNodes.filter(e => extractingEdges.some(edge => edge.source === e.id)) as ExtractionNode[]
+    return graphNodes.filter(e => extractingEdges.some(edge => edge.source === e.id)) as (ExtractionNode & Node)[]
   }
-
-  loadExtractingSiteNodes(site: ExtractingSiteNodeImpl, ...nodes: ExtractionNode[]) {
-    const toCreate = nodes.map(e => {
-      const id = `${site.id}-${randomString(32)}`
-
-      this.graphSubject.value?.edges?.push({
-        source: id,
-        target: site.id
-      })
-
-      return {
-        id,
-        label: `${site.factorySiteTarget.displayName} - ${e.purity}`,
-        overclockProfile: e.overclockProfile,
-        purity: e.purity,
-        factorySiteTarget: site.factorySiteTarget,
-        type: FactoryNode.TypeEnum.ExtractionNode
-      }
-    })
-
-    this.graphSubject.value?.nodes?.push(...toCreate);
-    this.graphSubject.value?.actualizeGraph()
-    this.configChanged.emit(false)
-  }
-
 
   addExtractingSiteNode(purity: Purity, extractingSite: ExtractingSiteNodeImpl, overclockingProfile: number = 100) {
     const id = `${extractingSite.id}-${randomString(32)}`
@@ -118,7 +91,7 @@ export class ExtractionConfigComponent {
     const node = {
       id,
       label: `${extractingSite.factorySiteTarget.displayName} - ${purity}`,
-      overclockProfile: overclockingProfile,
+      overclock: overclockingProfile,
       purity: purity,
       factorySiteTarget: extractingSite.factorySiteTarget,
       type: FactoryNode.TypeEnum.ExtractionNode
@@ -128,7 +101,42 @@ export class ExtractionConfigComponent {
     this.configChanged.emit(false)
   }
 
+  loadExtractionNode(config: QueryParamExtractionNode[]) {
+    this.graphSubject.pipe(take(1), filter(e => !isNil(e))).subscribe(graph => {
+      config.forEach(extractionNode => {
+        const site = graph.nodes.find(e => extractionNode.siteId === e.id) as ExtractingSiteNodeImpl
+
+        if (isNil(site)) {
+          return
+        }
+
+        this.addExtractingSiteNode(extractionNode.purity as Purity, site, extractionNode.overclock)
+      })
+    })
+  }
+
+  sealed(): QueryParamExtractionNode[] {
+    return this.extractingSites.map(site => {
+      return this.getExtractingNodes(site).map(e => ({
+        purity: e.purity,
+        overclock: e.overclock,
+        siteId: site.id
+      } as QueryParamExtractionNode))
+    }).flat()
+  }
+
   get purityOptions(): Purity[] {
     return Object.keys(Purity) as unknown as Purity[]
+  }
+
+  removeNode(node: (ExtractionNode & Node), siteId: string) {
+    const graph = this.graphSubject.value
+
+    if (isNil(graph)) {
+      return
+    }
+    remove(graph.nodes, (e) => e.id === node.id)
+    remove(graph.edges, (e) => e.source === node.id && e.target === siteId)
+    this.configChanged.emit(true)
   }
 }

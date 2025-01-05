@@ -21,7 +21,7 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {MatSliderModule} from "@angular/material/slider";
 
-import {FormsModule} from "@angular/forms";
+import {FormControl, FormsModule, Validators} from "@angular/forms";
 
 @Component({
   selector: 'app-factory-graph',
@@ -81,4 +81,7 @@ export class FactoryGraphComponent {
   getNodeWidth(node: any): number {
     return 250
   }
+
+  protected readonly isExtractingSiteNode = isExtractingSiteNode;
+  protected readonly isExtractionNode = isExtractionNode;
 }

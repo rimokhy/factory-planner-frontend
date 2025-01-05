@@ -29,10 +29,10 @@
       </mat-tab>
 
       <mat-tab label="Supply">
-        <app-factory-supplies  style="width: 100%;" (suppliedItemsUpdated)="reload($event)"></app-factory-supplies>
+        <app-factory-supplies  style="width: 100%;" (suppliedItemsUpdated)="actualizeGraph()"></app-factory-supplies>
       </mat-tab>
       <mat-tab label="Extraction">
-        <app-extraction-config [graphSubject]="graphSubject" [updateGraphSubject]="updateGraphSubject" (configChanged)="reload($event)"></app-extraction-config>
+        <app-extraction-config [graphSubject]="graphSubject" [updateGraphSubject]="updateGraphSubject" (configChanged)="actualizeGraph()"></app-extraction-config>
       </mat-tab>
 
     </mat-tab-group>

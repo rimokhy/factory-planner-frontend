@@ -55,6 +55,12 @@ export class GraphNavigator {
     this.actualizeGraph()
   }
 
+  clear(...types: FactoryNode.TypeEnum[]) {
+    types.forEach((type) => {
+      this.nodes = this.nodes.filter(node => node.type !== type);
+    })
+  }
+
   getRequiredTotal(className: string): number {
     const requirements = this.requirements.filter(e => !isNil(e.item) && e.item.className === className)
 
@@ -62,6 +68,7 @@ export class GraphNavigator {
       return req.requiredAmount;
     }))
   }
+
   getSuppliedTotal(className: string): number {
     const requirements = this.suppliedItems.filter(e => !isNil(e.item) && e.item.className === className)
 
@@ -85,7 +92,7 @@ export class GraphNavigator {
       return edge.totalOutputPerMinute
     }
     if (isExtractingSiteNode(target) && isExtractionNode(source)) {
-      return calculateExtractingSpeed(target.automaton, target.factorySiteTarget, source.purity, source.overclockProfile)
+      return calculateExtractingSpeed(target.automaton, target.factorySiteTarget, source.purity, source.overclock)
     }
     return undefined
   }
@@ -109,7 +116,7 @@ export class GraphNavigator {
     return Number(nb).toFixed(3)
   }
 
-  getItemNumberDisplay(node: ItemSiteNodeImpl) {
+  getBalance(node: GraphNode) {
     const producerEdges = this.getIncomingEdges(node)
     const consumerEdges = this.getOutgoingEdge(node)
     const totalRequired = sum(consumerEdges.map(edge => edge.totalOutputPerMinute))

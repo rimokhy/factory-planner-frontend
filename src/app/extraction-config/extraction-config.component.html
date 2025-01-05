@@ -17,7 +17,7 @@
       </mat-card-header>
 
       <mat-card-content>
-          @for (node of getExtractingNodes(site); track node; let last = $last) {
+          @for (node of getExtractingNodes(site); let idx =$index; let last = $last; track idx) {
             <div class="list-elem">
               <div class="flexbox-row" style="justify-content: space-between">
                 <mat-form-field style="width: 40%">
@@ -30,15 +30,17 @@
                 </mat-form-field>
                 <mat-form-field style="width: 30%">
                   <mat-label>Overclocking profile</mat-label>
-                  <input matInput type="number" [(ngModel)]="node.overclockProfile" (ngModelChange)="configChanged.emit(false)">
+                  <input matInput type="number" [(ngModel)]="node.overclock" (ngModelChange)="configChanged.emit(false)">
                   <span matTextSuffix>%</span>
 
                 </mat-form-field>
+                <button mat-icon-button (click)="removeNode(node, site.id)"><mat-icon>close</mat-icon></button>
+
               </div>
               <div class="flexbox-column" style="width: 90%; margin: auto">
 
                 <mat-slider min="1" max="250" step="0.5" style="width: 100%;">
-                  <input matSliderThumb [(ngModel)]="node.overclockProfile" (ngModelChange)="configChanged.emit(false)">
+                  <input matSliderThumb [(ngModel)]="node.overclock" (ngModelChange)="configChanged.emit(false)">
                 </mat-slider>
               </div>
             </div>

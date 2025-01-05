@@ -1,5 +1,5 @@
-import {AfterContentInit, AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
-import {BehaviorSubject, filter, lastValueFrom, Subject, take} from "rxjs";
+import {AfterContentInit, AfterViewInit, Component, inject, OnInit, ViewChild} from '@angular/core';
+import {BehaviorSubject, lastValueFrom, Subject, take} from "rxjs";
 import {
   FactoryRequirementsComponent,
   isExtractor,
@@ -17,14 +17,13 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {ActivatedRoute, Router} from "@angular/router";
 import {FactoryPlannerControllerService} from "../factory-planner-api";
-import {isEmpty, isEqual, isNil} from "lodash";
+import {isEqual, isNil} from "lodash";
 import {FactorySuppliesComponent} from "../factory-supplies/factory-supplies.component";
 import {makeFactorySiteRequest} from "../factory-requirements/item-site.request";
 import {isExtractionNode, isItemSiteNode} from "../factory-requirements/graph/node.factory";
 import {MatTooltipModule} from "@angular/material/tooltip";
-import {ItemSiteNodeImpl} from "../factory-requirements/graph/item-site.node";
-import {ExtractingSiteNodeImpl} from "../factory-requirements/graph/extracting-site.node";
-import {ExtractionConfigComponent, ExtractionNode} from "../extraction-config/extraction-config.component";
+import {ExtractionConfigComponent, QueryParamExtractionNode} from "../extraction-config/extraction-config.component";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 
 @Component({
@@ -51,13 +50,11 @@ import {ExtractionConfigComponent, ExtractionNode} from "../extraction-config/ex
 export class FactorySitePreviewComponent implements OnInit, AfterContentInit, AfterViewInit {
   updateGraphSubject: Subject<boolean> = new Subject<boolean>();
   graphSubject: BehaviorSubject<GraphNavigator | null> = new BehaviorSubject<GraphNavigator | null>(null)
-  private graphCreating = false
-
-
-
   @ViewChild(FactoryRequirementsComponent) requirements!: FactoryRequirementsComponent;
   @ViewChild(FactorySuppliesComponent) suppliesComponent!: FactorySuppliesComponent;
   @ViewChild(ExtractionConfigComponent) extractionComponent!: ExtractionConfigComponent;
+  private graphCreating = false
+  private snackBar = inject(MatSnackBar);
 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
@@ -89,20 +86,7 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
 
       await this.reload(true)
 
-      const config = params.getAll('extractionConfig').map(e => JSON.parse(e) as ExtractionNode & { siteId: string })
-
-
-      this.graphSubject.pipe(take(1), filter(e => !isNil(e))).subscribe(graph => {
-        config.forEach(extractionNode => {
-          const site = graph.nodes.find(e => extractionNode.siteId === e.id) as ExtractingSiteNodeImpl
-
-          if (isNil(site)) {
-            return
-          }
-
-          this.extractionComponent.addExtractingSiteNode(extractionNode.purity, site, extractionNode.overclockProfile)
-        })
-      })
+      this.extractionComponent.loadExtractionNode(params.getAll('extractionConfig').map(e => JSON.parse(e) as QueryParamExtractionNode))
     })
 
   }
@@ -119,6 +103,8 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
 
     if (!this.graphCreating && !isEqual(sealed, existing)) {
       this.graphCreating = true
+      const oldExtractionConfig = this.extractionComponent.sealed()
+      console.log('old extraction config', oldExtractionConfig)
       const newGraph = new GraphNavigator(sealed, this.suppliesComponent.getSealedSuppliedItems(), this.updateGraphSubject)
       const graphRequest = sealed.map(e => makeFactorySiteRequest(e))
       const graphResponse = await lastValueFrom(this.factoryPlannerControllerService.planFactorySite(graphRequest))
@@ -127,6 +113,8 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
 
 
       this.graphSubject.next(newGraph)
+      this.extractionComponent.loadExtractionNode(oldExtractionConfig)
+
       this.updateGraphSubject.next(true)
       this.graphCreating = false
 
@@ -141,6 +129,8 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
        */
       return newGraph
     }
+    this.updateQueryParams()
+
     return null
   }
 
@@ -152,6 +142,8 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
     const supplied = this.suppliesComponent.getSealedSuppliedItems()
 
     this.graphSubject.value?.actualizeGraph(req, supplied)
+    this.updateQueryParams()
+
   }
 
   async reload(fullReload: boolean) {
@@ -161,7 +153,36 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
       this.actualizeGraph()
     }
 
-    this.updateQueryParams()
+  }
+
+  saveSite() {
+    const graph = this.graphSubject.value
+
+    if (isNil(graph)) {
+      this.snackBar.open('Cannot save without graph');
+      return
+    }
+    const hasNodeBalanceBelowZero = graph.nodes.some(e => graph.getBalance(e) < 0 && !isExtractionNode(e))
+
+    if (hasNodeBalanceBelowZero) {
+      this.snackBar.open('Some nodes have balance below 0');
+      return
+    }
+    // TODO confirm
+  }
+
+  nodeClicked(nodeClicked: GraphNode) {
+    const graph = this.graphSubject.value
+
+    if (isNil(graph)) {
+      return
+    }
+    //  && this.requirements.getSealedRequirements().every(e => e.item.className !== nodeClicked.factorySiteTarget.className)
+    if (isItemSiteNode(nodeClicked)) {
+      this.requirements.addFactoryRequirement(nodeClicked.factorySiteTarget)
+      this.reload(true)
+    }
+
   }
 
   private updateQueryParams() {
@@ -172,16 +193,9 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
       item: undefined,
     }))
 
-    const nodes = this.graphSubject.value?.nodes || []
-    const extractingSites = nodes.filter(e => e instanceof ExtractingSiteNodeImpl) as ExtractingSiteNodeImpl[]
-    const extractingNodes = extractingSites.map(site => {
-      return this.extractionComponent.getExtractingNodes(site).map(e => ({
-        purity: e.purity,
-        overclock: e.overclockProfile,
-        siteId: site.id
-      }))
-    }).flat()
+    const extractingNodes = this.extractionComponent.sealed()
 
+    console.log('update', extractingNodes)
 
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
@@ -193,7 +207,6 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
       queryParamsHandling: 'merge',
     });
   }
-
 
   private getQueryParamRequirements(): QueryParamRequirement[] {
     if (!this.requirements) throw new Error('no req, called too soon ?')
@@ -211,25 +224,5 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
         extractorClass
       });
     })
-  }
-
-
-  saveSite() {
-    // is valid ?
-
-  }
-
-  nodeClicked(nodeClicked: GraphNode) {
-    const graph = this.graphSubject.value
-
-    if (isNil(graph)) {
-      return
-    }
-    //  && this.requirements.getSealedRequirements().every(e => e.item.className !== nodeClicked.factorySiteTarget.className)
-    if (isItemSiteNode(nodeClicked)) {
-      this.requirements.addFactoryRequirement(nodeClicked.factorySiteTarget)
-      this.reload(true)
-    }
-
   }
 }
