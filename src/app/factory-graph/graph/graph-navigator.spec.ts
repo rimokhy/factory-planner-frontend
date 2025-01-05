@@ -3,7 +3,7 @@ import {GraphNavigator} from "./graph-navigator";
 import {lastValueFrom, Subject} from "rxjs";
 import {TestBed} from "@angular/core/testing";
 import {appConfig} from "../../app.config";
-import {makeFactorySiteRequest} from "../item-site.request";
+import {makeFactorySiteRequest} from "../../factory-requirements/item-site.request";
 import {
   Configuration,
   FactoryEdge,

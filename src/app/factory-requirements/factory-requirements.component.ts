@@ -14,8 +14,8 @@ import {ItemDescriptorPickerComponent} from "../item-descriptor-picker/item-desc
 import {isEmpty, isEqual, isNil} from "lodash";
 import {ActivatedRoute, Router} from "@angular/router";
 import {BehaviorSubject, lastValueFrom, skip, Subject, take} from "rxjs";
-import {GraphNavigator} from "./graph/graph-navigator";
-import {SealedRequirement} from "./graph/node.factory";
+import {GraphNavigator} from "../factory-graph/graph/graph-navigator";
+import {SealedRequirement} from "../factory-graph/graph/node.factory";
 import {makeFactorySiteRequest} from "./item-site.request";
 import {AmountPickerComponent} from "../amount-picker/amount-picker.component";
 import {RecipePickerComponent} from "../recipe-picker/recipe-picker.component";

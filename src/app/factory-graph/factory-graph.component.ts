@@ -1,21 +1,21 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {GraphNavigator, GraphNode} from "../factory-requirements/graph/graph-navigator";
+import {GraphNavigator, GraphNode} from "./graph/graph-navigator";
 import {BehaviorSubject, Subject} from "rxjs";
 import {
   isCraftingSiteNode,
   isExtractingSiteNode,
   isExtractionNode,
   isItemSiteNode
-} from "../factory-requirements/graph/node.factory";
+} from "./graph/node.factory";
 import {AsyncPipe, NgIf} from "@angular/common";
 import {MatCardModule} from "@angular/material/card";
 import {NgxGraphModule} from "@swimlane/ngx-graph";
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {MatTooltipModule} from "@angular/material/tooltip";
-import {ExtractingSiteNodeImpl} from "../factory-requirements/graph/extracting-site.node";
-import {ItemSiteNodeImpl} from "../factory-requirements/graph/item-site.node";
-import {CraftingSiteNodeImpl} from "../factory-requirements/graph/crafting-site.node";
+import {ExtractingSiteNodeImpl} from "./graph/extracting-site.node";
+import {ItemSiteNodeImpl} from "./graph/item-site.node";
+import {CraftingSiteNodeImpl} from "./graph/crafting-site.node";
 import {MatMenuModule} from "@angular/material/menu";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";

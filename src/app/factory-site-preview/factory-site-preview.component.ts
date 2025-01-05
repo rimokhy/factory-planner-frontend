@@ -7,7 +7,7 @@ import {
   QueryParamRequirement,
   QueryParamSuppliedItem
 } from "../factory-requirements/factory-requirements.component";
-import {GraphNavigator, GraphNode} from "../factory-requirements/graph/graph-navigator";
+import {GraphNavigator, GraphNode} from "../factory-graph/graph/graph-navigator";
 import {FactoryGraphComponent} from "../factory-graph/factory-graph.component";
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {AsyncPipe, NgIf} from "@angular/common";
@@ -20,7 +20,7 @@ import {FactoryPlannerControllerService} from "../factory-planner-api";
 import {isEqual, isNil} from "lodash";
 import {FactorySuppliesComponent} from "../factory-supplies/factory-supplies.component";
 import {makeFactorySiteRequest} from "../factory-requirements/item-site.request";
-import {isExtractionNode, isItemSiteNode} from "../factory-requirements/graph/node.factory";
+import {isExtractionNode, isItemSiteNode} from "../factory-graph/graph/node.factory";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {ExtractionConfigComponent, QueryParamExtractionNode} from "../extraction-config/extraction-config.component";
 import {MatSnackBar} from "@angular/material/snack-bar";

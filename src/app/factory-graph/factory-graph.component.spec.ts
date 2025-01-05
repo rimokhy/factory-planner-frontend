@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FactoryGraphComponent } from './factory-graph.component';
 import {Input} from "@angular/core";
 import {BehaviorSubject, Subject} from "rxjs";
-import {GraphNavigator} from "../factory-requirements/graph/graph-navigator";
+import {GraphNavigator} from "./graph/graph-navigator";
 import {FactoryRequirementsComponent} from "../factory-requirements/factory-requirements.component";
 import {appConfig} from "../app.config";
 

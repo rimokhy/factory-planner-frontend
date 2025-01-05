@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {BehaviorSubject} from "rxjs";
-import {GraphNavigator} from "../factory-requirements/graph/graph-navigator";
+import {GraphNavigator} from "../factory-graph/graph/graph-navigator";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {AsyncPipe} from "@angular/common";
 

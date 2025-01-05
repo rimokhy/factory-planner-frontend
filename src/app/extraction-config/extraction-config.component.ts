@@ -1,12 +1,12 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {ExtractingSiteNodeImpl} from "../factory-requirements/graph/extracting-site.node";
+import {ExtractingSiteNodeImpl} from "../factory-graph/graph/extracting-site.node";
 import {FormsModule} from "@angular/forms";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {MatSliderModule} from "@angular/material/slider";
 import {MatCardModule} from "@angular/material/card";
 import {BehaviorSubject, filter, Subject, take} from "rxjs";
-import {GraphNavigator} from "../factory-requirements/graph/graph-navigator";
+import {GraphNavigator} from "../factory-graph/graph/graph-navigator";
 import {ExtractingNode, FactoryNode} from "../factory-planner-api";
 import {MatSelectModule} from "@angular/material/select";
 import {MatButton, MatIconButton} from "@angular/material/button";

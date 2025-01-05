@@ -1,5 +1,5 @@
 import {CraftingSiteRequest, ExtractingSiteRequest, FactorySiteRequest, ItemSiteRequest} from "../factory-planner-api";
-import {SealedRequirement} from "./graph/node.factory";
+import {SealedRequirement} from "../factory-graph/graph/node.factory";
 import {isNil} from "lodash";
 import {isExtractor, isRecipe} from "./factory-requirements.component";
 

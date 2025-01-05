@@ -20,7 +20,7 @@ import {CraftingSiteNodeImpl} from "./crafting-site.node";
 import {ItemSiteNodeImpl} from "./item-site.node";
 import {ExtractingSiteNodeImpl} from "./extracting-site.node";
 import {Subject} from "rxjs";
-import {SealedSuppliedItem} from "../factory-requirements.component";
+import {SealedSuppliedItem} from "../../factory-requirements/factory-requirements.component";
 import {ExtractionNode} from "../../extraction-config/extraction-config.component";
 
 
