@@ -17,27 +17,35 @@
       </mat-card-header>
 
       <mat-card-content>
-          @for (node of getExtractingNodes(site); track node) {
-            <div class="flexbox-row" style="justify-content: space-between">
-              <mat-form-field style="width: 40%">
-                <mat-label>Node Purity</mat-label>
-                <mat-select [(ngModel)]="node.purity" (selectionChange)="configChanged.emit(false)">
-                  @for (purity of purityOptions; track purity) {
-                    <mat-option [value]="purity">{{purity}}</mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-              <mat-form-field style="width: 30%">
-                <mat-label>Overclocking profile</mat-label>
-                <input matInput type="number" [(ngModel)]="node.overclockProfile" (ngModelChange)="configChanged.emit(false)">
-              </mat-form-field>
-            </div>
-            <div class="flexbox-column">
+          @for (node of getExtractingNodes(site); track node; let last = $last) {
+            <div class="list-elem">
+              <div class="flexbox-row" style="justify-content: space-between">
+                <mat-form-field style="width: 40%">
+                  <mat-label>Node Purity</mat-label>
+                  <mat-select [(ngModel)]="node.purity" (selectionChange)="configChanged.emit(false)">
+                    @for (purity of purityOptions; track purity) {
+                      <mat-option [value]="purity">{{purity}}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field style="width: 30%">
+                  <mat-label>Overclocking profile</mat-label>
+                  <input matInput type="number" [(ngModel)]="node.overclockProfile" (ngModelChange)="configChanged.emit(false)">
+                  <span matTextSuffix>%</span>
 
-              <mat-slider min="1" max="250" step="0.5" style="width: 100%;">
-                <input matSliderThumb [(ngModel)]="node.overclockProfile" (ngModelChange)="configChanged.emit(false)">
-              </mat-slider>
+                </mat-form-field>
+              </div>
+              <div class="flexbox-column" style="width: 90%; margin: auto">
+
+                <mat-slider min="1" max="250" step="0.5" style="width: 100%;">
+                  <input matSliderThumb [(ngModel)]="node.overclockProfile" (ngModelChange)="configChanged.emit(false)">
+                </mat-slider>
+              </div>
             </div>
+            @if (!last) {
+
+            <mat-divider style="margin-bottom: 16px"></mat-divider>
+            }
           }
 
       </mat-card-content>

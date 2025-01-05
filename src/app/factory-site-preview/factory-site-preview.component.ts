@@ -93,7 +93,6 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
 
 
       this.graphSubject.pipe(take(1), filter(e => !isNil(e))).subscribe(graph => {
-        console.log('piped to here', config)
         config.forEach(extractionNode => {
           const site = graph.nodes.find(e => extractionNode.siteId === e.id) as ExtractingSiteNodeImpl
 
@@ -184,7 +183,6 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
     }).flat()
 
 
-    console.log('extractingNodes update param', extractingNodes)
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
       queryParams: {

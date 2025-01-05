@@ -15,6 +15,7 @@ import {MatSelectModule} from "@angular/material/select";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatMenuModule} from "@angular/material/menu";
+import {MatDividerModule} from "@angular/material/divider";
 
 function randomString(len: number) {
   const p = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -55,7 +56,8 @@ export interface ExtractionNode {
     MatButton,
     MatIcon,
     MatIconButton,
-    MatMenuModule
+    MatMenuModule,
+    MatDividerModule
   ],
   templateUrl: './extraction-config.component.html',
   styleUrl: './extraction-config.component.scss'

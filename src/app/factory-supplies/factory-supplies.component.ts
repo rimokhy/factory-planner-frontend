@@ -10,6 +10,7 @@ import {
 } from "../factory-requirements/factory-requirements.component";
 import {isEmpty, isNil} from "lodash";
 import {ItemDescriptorControllerService, ItemDescriptorDto} from "../factory-planner-api";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'app-factory-supplies',
@@ -17,7 +18,8 @@ import {ItemDescriptorControllerService, ItemDescriptorDto} from "../factory-pla
   imports: [
     AmountPickerComponent,
     ItemDescriptorPickerComponent,
-    RecipePickerComponent
+    RecipePickerComponent,
+    MatDivider
   ],
   templateUrl: './factory-supplies.component.html',
   styleUrl: './factory-supplies.component.scss'

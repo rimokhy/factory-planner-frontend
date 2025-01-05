@@ -1,5 +1,5 @@
 <div>
-  @for (factoryRequirement of requiredFactoryItems; track factoryRequirement; let idx = $index) {
+  @for (factoryRequirement of requiredFactoryItems; track factoryRequirement; let idx = $index; let isLast = $last) {
     <div class="flexbox-column">
       <div class="flexbox-row" style="justify-content: space-between;">
         <app-item-descriptor-picker [style.width]="'100%'"
@@ -15,6 +15,12 @@
         <app-amount-picker [amountSelected]="factoryRequirement.requiredAmount"></app-amount-picker>
       </div>
     </div>
+
+
+    @if (!isLast) {
+      <mat-divider style="margin-bottom: 16px"></mat-divider>
+    }
+
   }
 
 

@@ -1,4 +1,4 @@
-<mat-grid-list cols="4" gutterSize="0px" rowHeight="fit" [style.width]="'100%'" class="page-content">
+<mat-grid-list cols="4" gutterSize="0px" rowHeight="fit" [style.width]="'100%'" [style.height]="'100%'" class="page-content">
   <mat-grid-tile
     [colspan]="3"
     [rowspan]="2">
@@ -25,15 +25,11 @@
 
     <mat-tab-group>
       <mat-tab label="Requirements">
-        <app-factory-requirements style="width: 100%;"
-                                  (requirementUpdated)="reload($event)"
-        ></app-factory-requirements>
+        <app-factory-requirements style="width: 100%;" (requirementUpdated)="reload($event)"></app-factory-requirements>
       </mat-tab>
 
       <mat-tab label="Supply">
-        <app-factory-supplies  style="width: 100%;" (suppliedItemsUpdated)="reload($event)">
-
-        </app-factory-supplies>
+        <app-factory-supplies  style="width: 100%;" (suppliedItemsUpdated)="reload($event)"></app-factory-supplies>
       </mat-tab>
       <mat-tab label="Extraction">
         <app-extraction-config [graphSubject]="graphSubject" [updateGraphSubject]="updateGraphSubject" (configChanged)="reload($event)"></app-extraction-config>
