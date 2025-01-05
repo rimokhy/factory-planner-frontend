@@ -91,14 +91,11 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
 
       const config = params.getAll('extractionConfig').map(e => JSON.parse(e) as ExtractionNode & { siteId: string })
 
-      this.graphSubject.pipe(take(1), filter(e => !isNil(e))).subscribe(graph => {
-        if (isNil(graph)) {
-          return
-        }
 
+      this.graphSubject.pipe(take(1), filter(e => !isNil(e))).subscribe(graph => {
+        console.log('piped to here', config)
         config.forEach(extractionNode => {
-          const nodes = this.graphSubject.value?.nodes || []
-          const site = nodes.find(e => extractionNode.siteId === e.id) as ExtractingSiteNodeImpl
+          const site = graph.nodes.find(e => extractionNode.siteId === e.id) as ExtractingSiteNodeImpl
 
           if (isNil(site)) {
             return
@@ -122,7 +119,6 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
     const existing = this.graphSubject?.value?.requirements
 
     if (!this.graphCreating && !isEqual(sealed, existing)) {
-      console.log('creating')
       this.graphCreating = true
       const newGraph = new GraphNavigator(sealed, this.suppliesComponent.getSealedSuppliedItems(), this.updateGraphSubject)
       const graphRequest = sealed.map(e => makeFactorySiteRequest(e))
@@ -134,7 +130,6 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
       this.graphSubject.next(newGraph)
       this.updateGraphSubject.next(true)
       this.graphCreating = false
-      console.log('created')
 
       // Autoloading of requirement / extraction node in side panel
       /*
@@ -189,6 +184,7 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
     }).flat()
 
 
+    console.log('extractingNodes update param', extractingNodes)
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
       queryParams: {

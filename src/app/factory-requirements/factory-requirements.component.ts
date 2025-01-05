@@ -13,7 +13,7 @@ import {
 import {ItemDescriptorPickerComponent} from "../item-descriptor-picker/item-descriptor-picker.component";
 import {isEmpty, isEqual, isNil} from "lodash";
 import {ActivatedRoute, Router} from "@angular/router";
-import {BehaviorSubject, lastValueFrom, Subject, take} from "rxjs";
+import {BehaviorSubject, lastValueFrom, skip, Subject, take} from "rxjs";
 import {GraphNavigator} from "./graph/graph-navigator";
 import {SealedRequirement} from "./graph/node.factory";
 import {makeFactorySiteRequest} from "./item-site.request";
@@ -103,8 +103,19 @@ export class FactoryRequirementsComponent {
 
       return this.createFactoryItemRequirement(item, recipeOrExtractor, req.requiredAmount)
     }))
-    this.requiredFactoryItems.forEach(e => {
-      this.bindSubscriptions(e)
+    this.requiredFactoryItems.forEach(({item, requiredAmount, manufacturing}) => {
+      item.pipe(skip(1)).subscribe(value => {
+        if (isNil(value)) {
+          return
+        }
+        this.requirementUpdated.emit(true)
+      })
+      manufacturing.pipe(skip(1)).subscribe(value => {
+        this.requirementUpdated.emit(true)
+      })
+      requiredAmount.pipe(skip(1)).subscribe(value => {
+        this.requirementUpdated.emit(false)
+      })
     })
   }
 
