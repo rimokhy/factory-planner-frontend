@@ -24,7 +24,9 @@ import {SealedSuppliedItem} from "../../factory-requirements/factory-requirement
 import {ExtractionNode} from "../../extraction-config/extraction-config.component";
 
 
-export type GraphNode = Node & (CraftingSiteNodeImpl | ExtractingSiteNodeImpl | ItemSiteNodeImpl | (ExtractionNode & { factorySiteTarget: ItemDescriptorDto })) & { type: FactoryNode.TypeEnum};
+export type GraphNode = Node & (CraftingSiteNodeImpl | ExtractingSiteNodeImpl | ItemSiteNodeImpl | (ExtractionNode & {
+  factorySiteTarget: ItemDescriptorDto
+})) & { type: FactoryNode.TypeEnum };
 export type GraphEdge = Edge & FactoryEdge;
 
 
@@ -124,6 +126,7 @@ export class GraphNavigator {
     return (totalProduced - totalRequired)
   }
 
+
   actualizeGraph(requirements: SealedRequirement[] | undefined = undefined, suppliedItems: SealedSuppliedItem[] | undefined = undefined): void {
     if (!isNil(requirements)) {
       this.requirements = requirements
@@ -144,6 +147,9 @@ export class GraphNavigator {
 
         this.computeItemRequirement(item, this.getRequiredTotal(item.factorySiteTarget.className))
       })
+
+    this.recalculateUntil()
+
     this.edges.forEach(e => {
       const total = this.computeLink(e)
 
@@ -151,39 +157,8 @@ export class GraphNavigator {
         e.totalOutputPerMinute = total
       }
     })
-    this.nodes.filter(node => node instanceof CraftingSiteNodeImpl).forEach(craftingSite => {
-      const producedItemEdges = this.getOutgoingEdge(craftingSite)
 
-      producedItemEdges
-        .forEach(edge => {
-          const actualProduced = this.computeLink(edge)!!
-          const producedItem = this.nodes.find(node => node.id === edge.target)!!
-          const requiredItems = this.getTotalItemRequiredItems(producedItem as ItemSiteNodeImpl)
-          const failedToMatchRequirement = actualProduced < requiredItems
 
-          if (failedToMatchRequirement &&
-            producedItem instanceof ItemSiteNodeImpl &&
-            craftingSite instanceof CraftingSiteNodeImpl &&
-            !this.isCyclicRelationship(craftingSite, producedItem)) {
-            console.log('Recalculation', craftingSite.id, producedItem.id, actualProduced, requiredItems)
-
-            const requiredCycles = this.computeRecipe(craftingSite, producedItem as ItemSiteNodeImpl, requiredItems)
-
-            if (!isNil(requiredCycles)) {
-              craftingSite.requiredMachines = requiredCycles
-              edge.totalOutputPerMinute = requiredItems
-            }
-          }
-
-        })
-    })
-    this.edges.forEach(e => {
-      const total = this.computeLink(e)
-
-      if (total) {
-        e.totalOutputPerMinute = total
-      }
-    })
     itemNodes.forEach(item => {
       const producers = this.getIncomingEdges(item)
 
@@ -209,6 +184,71 @@ export class GraphNavigator {
     })
 
     this.updateGraphSubject?.next(true)
+  }
+
+  getOutgoingEdge(node: GraphNode): GraphEdge[] {
+    return this.edges.filter(edge => edge.source === node.id)
+  }
+
+  getIncomingEdges(node: GraphNode): GraphEdge[] {
+    return this.edges.filter(edge => edge.target === node.id)
+  }
+
+  private recalculateUntil() {
+    let updatedNodes: GraphNode[] = []
+    do {
+      updatedNodes = this.calculateMissingReq()
+    } while (!isEmpty(updatedNodes))
+
+  }
+
+  private calculateMissingReq(): GraphNode[] {
+    const nodeUpdated: GraphNode[] = []
+
+    this.nodes.filter(node => node instanceof CraftingSiteNodeImpl).forEach(craftingSite => {
+      const producedItemEdges = this.getOutgoingEdge(craftingSite)
+
+      producedItemEdges
+        .forEach(edge => {
+          const actualProduced = this.computeLink(edge)!!
+          const producedItem = this.nodes.find(node => node.id === edge.target)!!
+          const requiredItems = this.getTotalItemRequiredItems(producedItem as ItemSiteNodeImpl)
+          const res = parseFloat((actualProduced - requiredItems).toPrecision(5))
+          const failedToMatchRequirements = res < 0.00000
+          console.log('PreRecalc', craftingSite.id, producedItem.id, actualProduced, requiredItems, {
+            preciseRes: res,
+            res: actualProduced - requiredItems
+          })
+
+          if (failedToMatchRequirements &&
+            producedItem instanceof ItemSiteNodeImpl &&
+            craftingSite instanceof CraftingSiteNodeImpl &&
+            !this.isCyclicRelationship(craftingSite, producedItem)) {
+            console.log('Calc', craftingSite.id, producedItem.id, actualProduced, requiredItems, {
+              preciseRes: res,
+              res: actualProduced - requiredItems
+            })
+
+            const requiredCycles = this.computeRecipe(craftingSite, producedItem as ItemSiteNodeImpl, requiredItems)
+
+            if (!isNil(requiredCycles)) {
+              nodeUpdated.push(producedItem)
+
+              craftingSite.requiredMachines = requiredCycles
+              edge.totalOutputPerMinute = requiredItems
+            }
+          }
+        })
+      this.edges.forEach(e => {
+        const total = this.computeLink(e)
+
+        if (total) {
+          e.totalOutputPerMinute = total
+        }
+      })
+    })
+
+    return nodeUpdated
   }
 
   private isCyclicRelationship(craftingSite: CraftingSiteNodeImpl, itemSite: ItemSiteNodeImpl): boolean {
@@ -328,14 +368,6 @@ export class GraphNavigator {
     }
   }
 
-   getOutgoingEdge(node: GraphNode): GraphEdge[] {
-    return this.edges.filter(edge => edge.source === node.id)
-  }
-
-   getIncomingEdges(node: GraphNode): GraphEdge[] {
-    return this.edges.filter(edge => edge.target === node.id)
-  }
-
   private isNodeExisting(node: GraphNode): boolean {
     return this.nodes.some(e => e.id === node.id)
   }
@@ -343,4 +375,5 @@ export class GraphNavigator {
   private isEdgeExisting(edge: FactoryEdge): boolean {
     return this.edges.some(e => e.source === edge.source && e.target === edge.target)
   }
+
 }
