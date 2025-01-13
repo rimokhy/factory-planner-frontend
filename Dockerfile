@@ -15,7 +15,7 @@ RUN yarn ng build --configuration=production
 
 FROM nginx:latest
 
-COPY nginx.conf /etc/nginx
+#COPY nginx.conf /etc/nginx
 COPY --from=build app/dist/factory-planner/browser/* /usr/share/nginx/html
 
 EXPOSE 80

@@ -107,7 +107,7 @@ export class GraphNavigator {
   getTotalItemRequiredItems(node: ItemSiteNodeImpl) {
     const recipes = this.getOutgoingEdge(node).map(edge => edge.totalOutputPerMinute)
 
-    return sum(recipes);
+    return sum(recipes) + this.getRequiredTotal(node.factorySiteTarget.className);
   }
 
   displayNumber(nb: number | undefined): string {
