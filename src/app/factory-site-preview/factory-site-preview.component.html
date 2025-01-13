@@ -2,21 +2,20 @@
   <mat-grid-tile
     [colspan]="3"
     [rowspan]="2">
-    <!--
-        <mat-tab-group>
-          <mat-tab label="Graph view" >
-    -->
+    <div  style="width: 100%;">
+      <mat-tab-group>
+        <mat-tab label="Graph view" >
 
-    <app-factory-graph  [style.width]="'100%'" [graphSubject]="graphSubject" [updateGraphSubject]="updateGraphSubject" (nodeClicked)="nodeClicked($event)"></app-factory-graph>
+          <app-factory-graph  [style.width]="'100%'" [graphSubject]="graphSubject" [updateGraphSubject]="updateGraphSubject" (nodeClicked)="nodeClicked($event)"></app-factory-graph>
 
-<!--
-      </mat-tab>
-      <mat-tab label="List view">
-        <app-factory-list-view [graphSubject]="graphSubject"></app-factory-list-view>
+        </mat-tab>
+        <mat-tab label="List view">
+          <app-factory-list-view [graphSubject]="graphSubject"></app-factory-list-view>
 
-      </mat-tab>
-    </mat-tab-group>
--->
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+
   </mat-grid-tile>
   <mat-grid-tile
     [colspan]="1"
