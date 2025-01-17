@@ -17,13 +17,15 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {ActivatedRoute, Router} from "@angular/router";
 import {FactoryPlannerControllerService} from "../factory-planner-api";
-import {isEqual, isNil} from "lodash";
+import {isEmpty, isEqual, isNil} from "lodash";
 import {FactorySuppliesComponent} from "../factory-supplies/factory-supplies.component";
 import {makeFactorySiteRequest} from "../factory-requirements/item-site.request";
 import {isExtractionNode, isItemSiteNode} from "../factory-graph/graph/node.factory";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {ExtractionConfigComponent, QueryParamExtractionNode} from "../extraction-config/extraction-config.component";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatToolbarModule} from "@angular/material/toolbar";
+import {ItemSiteNodeImpl} from "../factory-graph/graph/item-site.node";
 
 
 @Component({
@@ -42,7 +44,8 @@ import {MatSnackBar} from "@angular/material/snack-bar";
     MatButtonModule,
     FactorySuppliesComponent,
     MatTooltipModule,
-    ExtractionConfigComponent
+    ExtractionConfigComponent,
+    MatToolbarModule
   ],
   templateUrl: './factory-site-preview.component.html',
   styleUrl: './factory-site-preview.component.scss'
@@ -118,20 +121,22 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
       this.updateGraphSubject.next(true)
       this.graphCreating = false
 
-      // Autoloading of requirement / extraction node in side panel
-      /*
-      newGraph.nodes.filter(e => {
-        const edges = newGraph.getIncomingEdges(e)
-
-        return (e instanceof ItemSiteNodeImpl || e instanceof ExtractingSiteNodeImpl) && isEmpty(edges);
-      }).forEach(e => this.nodeClicked(e))
-
-       */
       return newGraph
     }
     this.updateQueryParams()
 
     return null
+  }
+
+  expandAll() {
+    const graph = this.graphSubject.value
+
+    if (!graph) return
+    graph.nodes.filter(e => {
+      const edges = graph.getIncomingEdges(e)
+
+      return (e instanceof ItemSiteNodeImpl) && isEmpty(edges);
+    }).forEach(e => this.nodeClicked(e))
   }
 
 
@@ -225,4 +230,6 @@ export class FactorySitePreviewComponent implements OnInit, AfterContentInit, Af
       });
     })
   }
+
+
 }

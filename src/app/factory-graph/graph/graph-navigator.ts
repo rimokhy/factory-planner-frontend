@@ -215,10 +215,7 @@ export class GraphNavigator {
           const requiredItems = this.getTotalItemRequiredItems(producedItem as ItemSiteNodeImpl)
           const res = parseFloat((actualProduced - requiredItems).toPrecision(5))
           const failedToMatchRequirements = res < 0.00000
-          console.log('PreRecalc', craftingSite.id, producedItem.id, actualProduced, requiredItems, {
-            preciseRes: res,
-            res: actualProduced - requiredItems
-          })
+
 
           if (failedToMatchRequirements &&
             producedItem instanceof ItemSiteNodeImpl &&

@@ -60,7 +60,7 @@ body {
 
 .mat-grid-tile-content {
   width: 100%;
-  height: calc(100% + var(--mat-toolbar-standard-height) + 64px) !important;
+  height: calc(100% + var(--mat-toolbar-standard-height) + 64px + 64px) !important;
   overflow: auto;
   margin-right: 1em;
   display: flex !important;

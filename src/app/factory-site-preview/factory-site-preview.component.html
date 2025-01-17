@@ -5,7 +5,13 @@
     <div  style="width: 100%;">
       <mat-tab-group>
         <mat-tab label="Graph view" >
+          <mat-toolbar color="secondary">
+            <span>Graph configuration</span>
 
+            <button mat-icon-button aria-label="Expand items" matTooltip="Expand items" (click)="expandAll()">
+              <mat-icon>expand_all</mat-icon>
+            </button>
+          </mat-toolbar>
           <app-factory-graph  [style.width]="'100%'" [graphSubject]="graphSubject" [updateGraphSubject]="updateGraphSubject" (nodeClicked)="nodeClicked($event)"></app-factory-graph>
 
         </mat-tab>
